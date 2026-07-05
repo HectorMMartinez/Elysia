@@ -9,7 +9,7 @@ namespace Elysia.Core.Application.Dtos.User
 {
     public class ForgotPasswordRequestDto
     {
-        [Required(ErrorMessage = "Debes introducir e nombre de usuario")]
+        [Required(ErrorMessage = "Debes introducir  el usuario")]
         public required string Email { get; set; }
     }
 }

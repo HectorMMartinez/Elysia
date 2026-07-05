@@ -116,7 +116,7 @@ namespace Elysia.Infraestructure.Identity
                     {
 
                         c.NoResult();   //El token tiene un formato invalido
-                        c.Response.StatusCode = 500;
+                        c.Response.StatusCode = StatusCodes.Status401Unauthorized;
                         c.Response.ContentType = "text/plain";
                         return c.Response.WriteAsync(c.Exception.Message.ToString());
                     },
@@ -160,11 +160,12 @@ namespace Elysia.Infraestructure.Identity
 
             var serviceProvider = scope.ServiceProvider;
 
-       
+            var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-
             await DefaultRoles.seedAsync(roleManager);
+            await DefaultUserPropietario.seedAsync(userManager);    
+           
          
         }
         #endregion

@@ -99,7 +99,7 @@ namespace Elysia.Infraestructure.Identity.Services
             {
 
                 responseDto.HasError = true;
-                responseDto.Errors!.Add($"These credentials are invalid for this user: {user.UserName}");
+                responseDto.Errors!.Add($"These credentials are invalid for this user: {user.Email}");
                 return responseDto;
 
             }
@@ -267,7 +267,7 @@ namespace Elysia.Infraestructure.Identity.Services
                 string token = await GetVerificationEmailToken(User);
 
                 var confirmLink =
-                   $"http://localhost:5500/Assets/view/confirmAccount.html?userId={User.Id}&token={token}";
+                   $"http://localhost:5173/confirm-account?userId={User.Id}&token={token}";
 
 
                 var templatePath = Path.Combine(
@@ -485,7 +485,7 @@ namespace Elysia.Infraestructure.Identity.Services
                     string token = await GetVerificationEmailToken(user);
 
                     var confirmLink =
-                       $"http://localhost:5500/Assets/view/confirmAccount.html?userId={user.Id}&token={token}";
+                       $"http://localhost:5173/confirm-account?userId={user.Id}&token={token}";
 
 
                     var templatePath = Path.Combine(
@@ -881,6 +881,7 @@ namespace Elysia.Infraestructure.Identity.Services
 
 
             user.EmailConfirmed = true;
+            user.IsActive = true;
             await userManager.UpdateAsync(user);
 
             return response;
@@ -926,7 +927,7 @@ namespace Elysia.Infraestructure.Identity.Services
 
             var encodeToken = Uri.EscapeDataString(ressetToken);
             var confirmLink =
-               $"http://localhost:5500/Assets/view/changePassword.html?userId={user.Id}&token={encodeToken}";
+               $"http://localhost:5173/reset-password?userId={user.Id}&token={encodeToken}";
 
 
             var templatePath = Path.Combine(
@@ -970,7 +971,11 @@ namespace Elysia.Infraestructure.Identity.Services
 
             if (dto == null)
             {
-                return null;
+                return new ConfirmResponseDto
+                {
+                    HasError = true,
+                    Message = "Invalid confirmation request."
+                };
             }
 
 
@@ -979,9 +984,14 @@ namespace Elysia.Infraestructure.Identity.Services
                )
             {
 
-                return null;
+                return new ConfirmResponseDto
+                {
+                    HasError = true,
+                    Message = "Invalid confirmation request."
+                };
 
             }
+
 
 
             var user = await userManager.FindByIdAsync(dto.UserId);
@@ -1003,6 +1013,7 @@ namespace Elysia.Infraestructure.Identity.Services
                 response.HasError = false;
                 response.Message = $"Account confirmed for {user.Email}. you can now use the app";
                 user.IsActive = true;
+                await userManager.UpdateAsync(user);
                 return response;
 
             }
