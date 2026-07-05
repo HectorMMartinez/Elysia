@@ -1,5 +1,8 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+// IMPORTS
+
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
 
 import {
   FaUser,
@@ -10,9 +13,275 @@ import {
   FaCamera,
 } from "react-icons/fa";
 
+import FormInput from "../../components/forms/FormInput";
+import FormButton from "../../components/forms/FormButton";
+import FormAlert from "../../components/forms/FormAlert";
+
+import authService from "../../services/authService";
+import planService from "../../services/planService";
+
+import { registerValidation } from "../../validations/registerValidation";
+
+
 
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+
+  const [apiError, setApiError] = useState("");
+  const [plans, setPlans] = useState([]);
+
+  const [loadingPlans, setLoadingPlans] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState(null);
+  const navigate = useNavigate();
+
+  const {
+  register,
+  handleSubmit,
+  watch,
+  trigger,
+  setValue,
+  formState: { errors },
+} = useForm({
+  mode: "onBlur",
+  defaultValues: {
+    // ===== PASO 1 =====
+    name: "",
+    lastName: "",
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phone: "",
+    cardId: "",
+    profileImage: null,
+
+    // ===== PASO 2 =====
+    restaurantName: "",
+    specialty: "",
+    restaurantPhone: "",
+    rnc: "",
+    openingTime: "",
+    closingTime: "",
+    address: "",
+    restaurantLogo: null,
+
+    // ===== PASO 3 =====
+    termsAccepted: false,
+
+    cardholderName: "",
+    cardNumber: "",
+    cardType: "Visa",
+    cvv: "",
+    expiryMonth: "",
+    expiryYear: "",
+  },
+});
+
+  const password = watch("password");
+  const termsAccepted = watch("termsAccepted");
+
+  useEffect(() => {
+
+    const loadPlans = async () => {
+
+        try {
+
+            setLoadingPlans(true);
+
+            const plans = await planService.getAll();
+
+            setPlans(plans);
+
+        } catch (error) {
+
+            setApiError("No se pudieron cargar los planes.");
+
+        } finally {
+
+            setLoadingPlans(false);
+
+        }
+
+    };
+
+    loadPlans();
+
+}, []);
+
+
+
+  const validateStep1 = async () => {
+
+    return await trigger([
+        "name",
+        "lastName",
+        "username",
+        "email",
+        "password",
+        "confirmPassword",
+        "phone",
+        "cardId"
+    ]);
+
+};
+
+const validateStep2 = async () => {
+
+    return await trigger([
+        "restaurantName",
+        "specialty",
+        "restaurantPhone",
+        "rnc",
+        "openingTime",
+        "closingTime",
+        "address"
+    ]);
+
+};
+
+
+const validateStep3 = async () => {
+
+    setApiError("");
+
+    if (!selectedPlanId) {
+
+        setApiError("Debe seleccionar un plan.");
+
+        return false;
+
+    }
+
+    const isValid = await trigger([
+        "termsAccepted",
+        "cardholderName",
+        "cardNumber",
+        "cardType",
+        "cvv",
+        "expiryMonth",
+        "expiryYear"
+    ]);
+
+    return isValid;
+
+};
+
+
+ const handleNext = async ()=>{
+
+    setApiError("");
+
+    if(step===1){
+
+        if(await validateStep1()){
+
+            setStep(2);
+
+        }
+
+        return;
+
+    }
+
+    if(step===2){
+
+        if(await validateStep2()){
+
+            setStep(3);
+
+        }
+
+    }
+
+};
+
+const handlePrevious = ()=>{
+
+    setApiError("");
+
+    setStep(step-1);
+
+};
+
+
+const onSubmit = async(data)=>{
+
+    if(!(await validateStep3())) return;
+
+    setLoading(true);
+
+    setApiError("");
+
+    try{
+
+       const formData = new FormData();
+
+    // ===== USER =====
+    formData.append("name", data.name);
+    formData.append("lastName", data.lastName);
+    formData.append("username", data.username);
+    formData.append("email", data.email);
+    formData.append("password", data.password);
+    formData.append("phone", data.phone);
+    formData.append("idCard", data.cardId);
+
+    if (data.profileImage) {
+      formData.append("profileImage", data.profileImage);
+    }
+
+    // ===== RESTAURANT =====
+    formData.append("nombreRestaurante", data.restaurantName);
+    formData.append("especialidad", data.specialty);
+    formData.append("phoneRestaurante", data.restaurantPhone);
+    formData.append("rnc", data.rnc);
+    formData.append("horaApertura", data.openingTime);
+    formData.append("horaCierre", data.closingTime);
+    formData.append("direccionRestaurante", data.address);
+          
+     if (data.restaurantLogo) {
+      formData.append("logoRestaurante", data.restaurantLogo);
+    }
+
+
+    // ===== PLAN =====
+    formData.append("planId", selectedPlanId);
+
+    // ===== PAYMENT =====
+    formData.append("nombreTitular", data.cardholderName);
+    formData.append("numeroTarjeta", data.cardNumber);
+    formData.append("tipo", data.cardType);
+    formData.append("cvv", data.cvv);
+    formData.append("mesVencimiento", data.expiryMonth);
+    formData.append("anioVencimiento", data.expiryYear);
+
+    const res = await authService.register(formData);
+
+    if (res.success) {
+        navigate("/", {
+        state: {
+            message: "Registro exitoso. Revisa tu correo (incluida la carpeta de spam) para confirmar tu cuenta."
+        }
+    });
+    } else {
+      setApiError(res.message || "Error en registro");
+    }
+
+
+    }catch(error){
+
+        setApiError("Ha ocurrido un error.");
+
+    }finally{
+
+        setLoading(false);
+
+    }
+
+};
+
+
+
 
   return (
     <div className="min-h-screen bg-slate-100 py-10 px-4">
@@ -34,7 +303,6 @@ export default function RegisterPage() {
         </div>
 
         {/* Stepper */}
-
         <div className="flex justify-center items-center mb-10">
 
           <div
@@ -65,6 +333,11 @@ export default function RegisterPage() {
             3
           </div>
         </div>
+        {apiError && (
+         <div className="mb-6">
+             <FormAlert message={apiError} />
+         </div>
+        )}
 
         {/* Paso 1 */}
 
@@ -108,10 +381,23 @@ export default function RegisterPage() {
           </p>
 
           <input
-            type="file"
-            className="mt-4"
-          />
+          type="file"
+          accept=".jpg,.jpeg,.png"
+          onChange={(e) => {
+          setValue(
+          "profileImage",
+           e.target.files[0],
+           {
+            shouldValidate: true
+           });
+          }}
+          className="mt-4"/>
 
+           {errors.profileImage && (
+          <p className="text-red-500 text-sm mt-1">
+              {errors.profileImage.message}
+          </p>
+          )}
         </div>
 
       </div>
@@ -132,11 +418,20 @@ export default function RegisterPage() {
           <div className="relative">
             <FaUser className="absolute left-4 top-4 text-slate-400" />
 
-            <input
-              type="text"
-              placeholder="Kelvin"
-              className="w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:outline-none"
-            />
+           <input
+          type="text"
+          placeholder="Kelvin"
+          {...register("name", registerValidation.name)}
+          className={`w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:outline-none ${
+           errors.name
+            ? "border-red-500"
+            : "border-slate-300" }`}/>
+
+          {errors.name && (
+          <p className="text-red-500 text-sm mt-1">
+              {errors.name.message}
+          </p>
+          )}
           </div>
         </div>
 
@@ -151,11 +446,19 @@ export default function RegisterPage() {
             <input
               type="text"
               placeholder="Díaz"
-              className="w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:outline-none"
-            />
+              {...register("lastName", registerValidation.lastName)}
+              className={`w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:outline-none 
+                ${errors.lastName ? "border-red-500" : "border-slate-300" }`}/>
+
+            {errors.lastName && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.lastName.message}
+              </p>
+            )}
           </div>
         </div>
 
+         
         <div>
           <label className="block mb-2 font-medium">
             Usuario
@@ -167,10 +470,20 @@ export default function RegisterPage() {
             <input
               type="text"
               placeholder="kelvindiaz"
-              className="w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:outline-none"
+              {...register("username", registerValidation.username)}
+              className={`w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:outline-none ${
+                errors.username ? "border-red-500" : "border-slate-300"
+              }`}
             />
+            {errors.username && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.username.message}
+              </p>
+            )}
           </div>
         </div>
+         
+
 
         <div>
           <label className="block mb-2 font-medium">
@@ -183,10 +496,19 @@ export default function RegisterPage() {
             <input
               type="email"
               placeholder="correo@email.com"
-              className="w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:outline-none"
+              {...register("email", registerValidation.email)}
+              className={`w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:outline-none ${
+                errors.email ? "border-red-500" : "border-slate-300"
+              }`}
             />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.email.message}
+              </p>
+            )}
           </div>
         </div>
+            
 
         <div>
           <label className="block mb-2 font-medium">
@@ -199,10 +521,16 @@ export default function RegisterPage() {
             <input
               type="password"
               placeholder="********"
-              className="w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:outline-none"
-            />
+              {...register("password", registerValidation.password)}
+              className={`w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:outline-none ${
+              errors.password? "border-red-500": "border-slate-300"}`}/>
+
+              {errors.password && (
+                  <p className="text-red-500 text-sm mt-1">
+              {errors.password.message}</p>)}
           </div>
         </div>
+
 
         <div>
           <label className="block mb-2 font-medium">
@@ -212,13 +540,25 @@ export default function RegisterPage() {
           <div className="relative">
             <FaLock className="absolute left-4 top-4 text-slate-400" />
 
-            <input
-              type="password"
-              placeholder="********"
-              className="w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:outline-none"
-            />
+            <input type="password"
+                  placeholder="********"
+                   {...register("confirmPassword", {
+                    required: "Debe confirmar la contraseña",
+                   validate: (value) =>
+                   value === watch("password") || "Las contraseñas no coinciden",})}
+                   className={`w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:outline-none ${
+                   errors.confirmPassword
+                    ? "border-red-500"
+                    : "border-slate-300"
+                    }`}/>
+
+                  {errors.confirmPassword && (
+                     <p className="text-red-500 text-sm mt-1">
+                   {errors.confirmPassword.message}
+                   </p>)}
           </div>
         </div>
+
 
         <div>
           <label className="block mb-2 font-medium">
@@ -227,14 +567,21 @@ export default function RegisterPage() {
 
           <div className="relative">
             <FaPhone className="absolute left-4 top-4 text-slate-400" />
+              <input
+               type="text"
+               placeholder="8091234567"
+               {...register("phone", registerValidation.phone)}
+               className={`w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:outline-none ${
+               errors.phone
+               ? "border-red-500"
+               : "border-slate-300"}`}/>
 
-            <input
-              type="text"
-              placeholder="8091234567"
-              className="w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:outline-none"
-            />
+               {errors.phone && (
+                       <p className="text-red-500 text-sm mt-1">
+               {errors.phone.message}</p>)}
           </div>
         </div>
+
 
         <div>
           <label className="block mb-2 font-medium">
@@ -245,17 +592,22 @@ export default function RegisterPage() {
             <FaIdCard className="absolute left-4 top-4 text-slate-400" />
 
             <input
-              type="text"
-              placeholder="00112345678"
-              className="w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:outline-none"
-            />
+             type="text"
+             placeholder="00112345678"
+             {...register("cardId", registerValidation.cardId)}
+             className={`w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-violet-500 focus:outline-none ${
+             errors.cardId
+             ? "border-red-500"
+             : "border-slate-300"}`}/>
+
+             {errors.cardId && (
+                   <p className="text-red-500 text-sm mt-1">
+             {errors.cardId.message}</p>
+            )}
           </div>
         </div>
-
       </div>
-
-    </div>
-
+    </div>  
   </div>
         )}
 
@@ -301,10 +653,23 @@ export default function RegisterPage() {
           </p>
 
           <input
-            type="file"
-            className="mt-4"
-          />
+          type="file"
+          accept=".jpg,.jpeg,.png"
+          onChange={(e) => {
+          setValue(
+          "restaurantLogo",
+          e.target.files[0],
+           {
+             shouldValidate: true
+           });}}
 
+          className="mt-4"/>
+          
+           {errors.restaurantLogo && (
+                   <p className="text-red-500 text-sm mt-1">
+             {errors.restaurantLogo.message}</p>
+           )}
+          
         </div>
 
       </div>
@@ -319,106 +684,156 @@ export default function RegisterPage() {
 
         {/* Nombre Restaurante */}
 
-        <div>
-          <label className="block mb-2 font-medium">
-            Nombre Restaurante
-          </label>
+         <div>
+         <label className="block mb-2 font-medium">
+                Nombre Restaurante
+         </label>
 
-          <input
-            type="text"
-            placeholder="Elysia Restaurant"
-            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none"
-          />
-        </div>
+        <input
+        type="text"
+        placeholder="Elysia Restaurant"
+        {...register("restaurantName", registerValidation.restaurantName)}
+        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none ${
+        errors.restaurantName
+        ? "border-red-500"
+        : "border-slate-300"}`}/>
+
+       {errors.restaurantName && (
+        <p className="text-red-500 text-sm mt-1">
+            {errors.restaurantName.message}
+        </p>)}
+       </div>
 
         {/* Especialidad */}
 
         <div>
-          <label className="block mb-2 font-medium">
-            Especialidad
-          </label>
+       <label className="block mb-2 font-medium">
+           Especialidad
+       </label>
 
-          <input
-            type="text"
-            placeholder="Comida Dominicana"
-            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none"
-          />
-        </div>
+      <input
+        type="text"
+        placeholder="Comida Dominicana"
+        {...register("specialty", registerValidation.specialty)}
+        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none ${
+        errors.specialty
+         ? "border-red-500"
+         : "border-slate-300" }`}/>
+
+        {errors.specialty && (
+        <p className="text-red-500 text-sm mt-1">
+         {errors.specialty.message} </p>
+         )}</div>
 
         {/* Teléfono */}
 
-        <div>
-          <label className="block mb-2 font-medium">
-            Teléfono Restaurante
-          </label>
+         <div>
+        <label className="block mb-2 font-medium">
+             Teléfono Restaurante
+        </label>
 
-          <input
-            type="text"
-            placeholder="8091234567"
-            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none"
-          />
-        </div>
+         <input
+          type="text"
+          placeholder="8091234567"
+          {...register("restaurantPhone", registerValidation.restaurantPhone)}
+          className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none ${
+          errors.restaurantPhone
+          ? "border-red-500"
+          : "border-slate-300"}`}/>
+
+          {errors.restaurantPhone && (
+          <p className="text-red-500 text-sm mt-1">
+          {errors.restaurantPhone.message}
+         </p>)}</div>
+
 
         {/* RNC */}
 
         <div>
-          <label className="block mb-2 font-medium">
-            RNC
-          </label>
+         <label className="block mb-2 font-medium">
+         RNC
+       </label>
 
-          <input
-            type="text"
-            placeholder="123456789"
-            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none"
-          />
-        </div>
+      <input
+        type="text"
+        placeholder="123456789"
+        {...register("rnc", registerValidation.rnc)}
+        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none ${
+        errors.rnc
+        ? "border-red-500"
+        : "border-slate-300"}`}/>
+
+       {errors.rnc && (
+       <p className="text-red-500 text-sm mt-1">
+       {errors.rnc.message}
+       </p>)}</div>
 
         {/* Hora Apertura */}
 
         <div>
-          <label className="block mb-2 font-medium">
-            Hora Apertura
-          </label>
+        <label className="block mb-2 font-medium">
+          Hora Apertura
+       </label> 
 
-          <input
-            type="time"
-            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none"
-          />
-        </div>
+      <input
+        type="time"
+        {...register("openingTime", registerValidation.openingTime)}
+        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none ${
+        errors.openingTime
+        ? "border-red-500"
+        : "border-slate-300"
+        }`}/>
 
+       {errors.openingTime && (
+          <p className="text-red-500 text-sm mt-1">
+       {errors.openingTime.message}</p>)}
+      </div>
         {/* Hora Cierre */}
 
         <div>
-          <label className="block mb-2 font-medium">
-            Hora Cierre
-          </label>
+        <label className="block mb-2 font-medium">
+          Hora Cierre
+         </label>
 
-          <input
-            type="time"
-            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none"
-          />
-        </div>
+      <input
+       type="time"
+       {...register("closingTime", registerValidation.closingTime)}
+       className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none ${
+       errors.closingTime
+       ? "border-red-500"
+       : "border-slate-300"}`}/>
 
+       {errors.closingTime && (
+       <p className="text-red-500 text-sm mt-1">
+       {errors.closingTime.message}
+      </p> )}
+      </div>
       </div>
 
       {/* Dirección */}
 
-      <div className="mt-6">
+       <div className="mt-6">
 
-        <label className="block mb-2 font-medium">
+      <label className="block mb-2 font-medium">
           Dirección
-        </label>
+      </label>
 
-        <textarea
-          rows="4"
-          placeholder="Ingrese la dirección completa del restaurante"
-          className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none resize-none"
-        ></textarea>
+    <textarea
+     rows="4"
+     placeholder="Ingrese la dirección completa del restaurante"
+     {...register("address", registerValidation.address)}
+     className={`w-full px-4 py-3 border rounded-xl resize-none focus:ring-2 focus:ring-orange-500 focus:outline-none ${
+      errors.address
+        ? "border-red-500"
+        : "border-slate-300" }`}/>
 
-      </div>
-
+    {errors.address && (
+     <p className="text-red-500 text-sm mt-1">
+       {errors.address.message}
+     </p>
+   )}
+</div>
     </div>
-
   </div>
         )}
 
@@ -440,81 +855,94 @@ export default function RegisterPage() {
     </div>
 
     {/* Planes */}
-
     <h3 className="text-xl font-bold text-slate-800 mb-4">
-      Seleccione un Plan
-    </h3>
+  Seleccione un Plan
+</h3>
 
-    <div className="grid md:grid-cols-2 gap-6 mb-8">
-
-      {/* Plan Simple */}
-
-      <div className="border-2 border-slate-200 hover:border-violet-500 rounded-2xl p-6 bg-white shadow-sm hover:shadow-lg transition cursor-pointer">
-
+{loadingPlans ? (
+  <div className="text-center py-10">
+    Cargando planes...
+  </div>
+) : (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    {plans.map((plan) => (
+      <div
+        key={plan.id}
+        onClick={() => {
+          setSelectedPlanId(plan.id);
+          setApiError("");
+        }}
+        className={`
+          cursor-pointer rounded-2xl p-6 transition border-2 shadow-md
+          bg-gradient-to-br
+          ${
+            selectedPlanId === plan.id
+              ? "from-violet-600/10 to-purple-600/10 border-violet-600"
+              : "from-slate-50 to-white border-slate-200 hover:border-violet-500"
+          }
+        `}
+      >
         <div className="flex justify-between items-center mb-4">
           <h4 className="text-xl font-bold">
-            Plan Simple
+            {plan.nombre}
           </h4>
 
-          <span className="bg-violet-100 text-violet-700 px-3 py-1 rounded-full text-sm font-medium">
-            Básico
+          <span
+            className={`
+              px-3 py-1 rounded-full text-sm font-medium
+              ${
+                selectedPlanId === plan.id
+                  ? "bg-violet-600 text-white"
+                  : "bg-slate-100 text-slate-700"
+              }
+            `}
+          >
+            {selectedPlanId === plan.id
+              ? "Seleccionado"
+              : "Seleccionar"}
           </span>
         </div>
 
         <div className="text-4xl font-bold text-violet-600 mb-4">
-          RD$1,500
+          RD$ {Number(plan.precioMensual).toLocaleString()}
         </div>
 
-        <div className="text-slate-600 text-sm leading-6">
-          Diseñado para pequeños restaurantes que necesitan administrar
-          operaciones esenciales desde una sola plataforma.
-        </div>
+        <p className="text-slate-600 leading-6">
+          {plan.descripcion}
+        </p>
       </div>
-
-      {/* Plan Premium */}
-
-      <div className="border-2 border-amber-300 hover:border-amber-500 rounded-2xl p-6 bg-gradient-to-br from-amber-50 to-orange-50 shadow-md hover:shadow-xl transition cursor-pointer">
-
-        <div className="flex justify-between items-center mb-4">
-          <h4 className="text-xl font-bold">
-            Plan Premium
-          </h4>
-
-          <span className="bg-amber-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-            Recomendado
-          </span>
-        </div>
-
-        <div className="text-4xl font-bold text-amber-600 mb-4">
-          RD$3,500
-        </div>
-
-        <div className="text-slate-600 text-sm leading-6">
-          Incluye reportes avanzados, estadísticas, análisis de ventas,
-          alertas inteligentes y recomendaciones automáticas.
-        </div>
-      </div>
-
-    </div>
-
+    ))}
+  </div>
+)}   
+    
     {/* Términos */}
+<div className="mb-8 bg-slate-50 border border-slate-200 rounded-xl p-4">
 
-    <div className="mb-8 bg-slate-50 border border-slate-200 rounded-xl p-4">
+  <label className="flex items-center gap-3 cursor-pointer">
 
-      <label className="flex items-center gap-3 cursor-pointer">
+    <input
+      type="checkbox"
+      {...register(
+        "termsAccepted",
+        registerValidation.termsAccepted
+      )}
+      className="w-5 h-5"
+    />
 
-        <input
-          type="checkbox"
-          className="w-5 h-5"
-        />
+    <span className="text-slate-700">
+      Acepto los términos y condiciones de Elysia.
+    </span>
 
-        <span className="text-slate-700">
-          Acepto los términos y condiciones de Elysia.
-        </span>
+  </label>
 
-      </label>
+  {errors.termsAccepted && (
+    <p className="text-red-500 text-sm mt-2">
+      {errors.termsAccepted.message}
+    </p>
+  )}
+</div>
 
-    </div>
+     
 
     {/* Tarjeta */}
 
@@ -527,27 +955,42 @@ export default function RegisterPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
         <div className="md:col-span-2">
-          <label className="block mb-2 font-medium">
-            Nombre del Titular
-          </label>
 
-          <input
-            type="text"
-            placeholder="Kelvin Díaz"
-            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none"
-          />
-        </div>
+        <label className="block mb-2 font-medium">
+          Nombre del Titular
+        </label>
+
+        <input
+          type="text"
+          placeholder="Kelvin Díaz"
+          {...register("cardholderName", registerValidation.cardholderName)}
+          className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none ${
+           errors.cardholderName
+           ? "border-red-500"
+           : "border-slate-300"}`}/>
+
+          {errors.cardholderName && (
+          <p className="text-red-500 text-sm mt-1">
+          {errors.cardholderName.message}</p>)}
+       </div>
 
         <div className="md:col-span-2">
           <label className="block mb-2 font-medium">
             Número de Tarjeta
           </label>
 
-          <input
-            type="text"
-            placeholder="1234 5678 9012 3456"
-            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none"
-          />
+        <input
+           type="text"
+            placeholder="1234567890123456"
+            {...register("cardNumber", registerValidation.cardNumber)}
+            className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none ${
+            errors.cardNumber
+            ? "border-red-500"
+            : "border-slate-300"}`}/>
+
+        {errors.cardNumber && (
+        <p className="text-red-500 text-sm mt-1">
+        {errors.cardNumber.message}</p>)} 
         </div>
 
         <div>
@@ -555,12 +998,36 @@ export default function RegisterPage() {
             Tipo de Tarjeta
           </label>
 
-          <select className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none">
-            <option>Seleccione</option>
-            <option>Visa</option>
-            <option>MasterCard</option>
-            <option>American Express</option>
-          </select>
+          <select
+
+    {...register("cardType", registerValidation.cardType)}
+
+    className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none ${
+        errors.cardType
+            ? "border-red-500"
+            : "border-slate-300"
+    }`}
+
+>
+
+    <option value="">Seleccione</option>
+    <option value="Visa">Visa</option>
+    <option value="MasterCard">MasterCard</option>
+    <option value="American Express">
+        American Express
+    </option>
+
+</select>
+
+{errors.cardType && (
+
+<p className="text-red-500 text-sm mt-1">
+
+    {errors.cardType.message}
+
+</p>
+
+)} 
         </div>
 
         <div>
@@ -569,10 +1036,25 @@ export default function RegisterPage() {
           </label>
 
           <input
-            type="text"
-            placeholder="123"
-            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none"
-          />
+    type="text"
+    placeholder="123"
+    {...register("cvv", registerValidation.cvv)}
+    className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none ${
+        errors.cvv
+            ? "border-red-500"
+            : "border-slate-300"
+    }`}
+/>
+
+{errors.cvv && (
+
+<p className="text-red-500 text-sm mt-1">
+
+    {errors.cvv.message}
+
+</p>
+
+)}
         </div>
 
         <div>
@@ -580,11 +1062,26 @@ export default function RegisterPage() {
             Mes Vencimiento
           </label>
 
-          <input
-            type="number"
-            placeholder="12"
-            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none"
-          />
+           <input
+    type="text"
+    placeholder="01"
+    {...register("expiryMonth", registerValidation.expiryMonth)}
+    className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none ${
+        errors.expiryMonth
+            ? "border-red-500"
+            : "border-slate-300"
+    }`}
+/>
+
+{errors.expiryMonth && (
+
+<p className="text-red-500 text-sm mt-1">
+
+    {errors.expiryMonth.message}
+
+</p>
+
+)}
         </div>
 
         <div>
@@ -593,10 +1090,25 @@ export default function RegisterPage() {
           </label>
 
           <input
-            type="number"
-            placeholder="2028"
-            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none"
-          />
+    type="text"
+    placeholder="2028"
+    {...register("expiryYear", registerValidation.expiryYear)}
+    className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none ${
+        errors.expiryYear
+            ? "border-red-500"
+            : "border-slate-300"
+    }`}
+/>
+
+{errors.expiryYear && (
+
+<p className="text-red-500 text-sm mt-1">
+
+    {errors.expiryYear.message}
+
+</p>
+
+)}
         </div>
 
       </div>
@@ -628,19 +1140,22 @@ export default function RegisterPage() {
 
           {step < 3 && (
             <button
-              onClick={() => setStep(step + 1)}
-              className="px-6 py-3 bg-violet-600 text-white rounded-lg hover:bg-violet-700"
-            >
+              onClick={handleNext}
+              type="button"
+               className="px-6 py-3 bg-violet-600 text-white rounded-lg hover:bg-violet-700"
+             >
               Siguiente
             </button>
           )}
 
           {step === 3 && (
             <button
-              className="px-6 py-3 bg-green-600 text-white rounded-lg"
-            >
-              Finalizar Registro
-            </button>
+            onClick={handleSubmit(onSubmit)}
+            type="button"
+            className="px-6 py-3 bg-green-600 text-white rounded-lg"
+           >
+           Finalizar Registro
+           </button>
           )}
         </div>
       </div>
