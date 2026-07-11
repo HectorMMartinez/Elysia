@@ -8,13 +8,15 @@ import FormAlert from "../../components/forms/FormAlert";
 import authService from "../../services/authService";
 import { loginValidation } from "../../validations/loginValidation";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 
 export default function LoginPage() {
 
   const location = useLocation();
   const navigate = useNavigate();
-  console.log("🔥 ENTRO AL LOGIN SUBMIT");
+  const { login } = useAuth();
+ 
   const {
     register,
     handleSubmit,
@@ -34,15 +36,17 @@ export default function LoginPage() {
   setLoading(true);
 
   try {
-    console.log("📦 LOGIN DATA:", data);
+    
 
     const res = await authService.login(data); 
-
-    console.log("📡 RESPONSE:", res);
+    
 
     if (res.success) {
+     
+      login(res.data); 
       navigate("/dashboard");
     } else {
+      
       setAlert({
         show: true,
         type: "error",
@@ -51,9 +55,7 @@ export default function LoginPage() {
     }
 
   } catch (error) {
-  console.log("💥 LOGIN ERROR COMPLETO:", error);
-  console.log("💥 RESPONSE:", error.response);
-  console.log("💥 DATA:", error.response?.data);
+ 
 
     setAlert({
       show: true,
