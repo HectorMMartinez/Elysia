@@ -75,7 +75,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(RegisterResponseDto))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Register(RegisterUserRequestDto dto)
+        public async Task<IActionResult> Register([FromForm] RegisterUserRequestDto dto)
         {
 
             try

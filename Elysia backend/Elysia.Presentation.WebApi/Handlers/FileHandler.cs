@@ -50,6 +50,7 @@
 
 
 
+        //elimina el folder completo
         public static bool Delete(string id, string folderName)
         {
             string basePath = $"Images/{folderName}/{id}";
@@ -66,6 +67,28 @@
 
             return true;
         }
+
+
+        //elimina una imagen especifica
+        public static bool DeleteImage(string? imagePath)
+        {
+            if (string.IsNullOrWhiteSpace(imagePath))
+                return false;
+
+            string fullPath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                imagePath.Replace("/", Path.DirectorySeparatorChar.ToString()));
+
+            if (!File.Exists(fullPath))
+                return false;
+
+            File.Delete(fullPath);
+
+            return true;
+        }
+
+
     }
 
 }

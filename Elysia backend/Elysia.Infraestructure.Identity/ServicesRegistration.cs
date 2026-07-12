@@ -164,6 +164,7 @@ namespace Elysia.Infraestructure.Identity
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
             await DefaultRoles.seedAsync(roleManager);
+            await DefaultUserAdmin.seedAsync(userManager);  
             await DefaultUserPropietario.seedAsync(userManager);    
            
          
