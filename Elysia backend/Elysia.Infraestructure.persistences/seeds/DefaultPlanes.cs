@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Elysia.Infraestructure.persistences.seeds
 {
-    public class DefaultPlanes
+    public static class DefaultPlanes
     {
 
         public static async Task SeedAsync(ElysiaContext context)

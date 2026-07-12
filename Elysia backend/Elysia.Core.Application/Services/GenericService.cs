@@ -106,7 +106,6 @@ namespace Elysia.Core.Application.Services
 
 
             var UpdatedEntity = _mapper.Map<Tentity>(entity);
-
             var entityUpdated = await _genericRepo.UpdateAsync(id, UpdatedEntity);
 
 

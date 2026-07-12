@@ -51,7 +51,10 @@ namespace Elysia.Infraestructure.persistences
             Service.AddScoped(typeof(IGenericRepository<>),typeof(GenericRepository<>));
             Service.AddScoped<IPlanRepository, PlanRepository>();
             Service.AddScoped<ITarjetaRepository, TarjetaRepository>();
-            Service.AddScoped<IMembresiaRepository,MembresiaRepository>();  
+            Service.AddScoped<IMembresiaRepository,MembresiaRepository>();
+            Service.AddScoped<IProductoRepository, ProductoRepository>();
+            Service.AddScoped<ICategoriaPlatoRepository, CategoriaPlatoRepository>();
+            Service.AddScoped<IMovimientoRepository, MovimientoInventarioRepository>();
             #endregion
 
         }
@@ -65,7 +68,7 @@ namespace Elysia.Infraestructure.persistences
             var serviceProvider = scope.ServiceProvider;
 
             var elysiaContext = serviceProvider.GetRequiredService<ElysiaContext>();
-
+            await DefaultCategoriaPlato.SeedAsync(elysiaContext);   
             await DefaultPlanes.SeedAsync(elysiaContext);
         }
 
