@@ -6,8 +6,12 @@ import {
   FaBoxOpen,
   FaUsers,
   FaChartLine,
-  FaSignOutAlt
+  FaSignOutAlt,
+  FaClipboardList,
+  FaUserCircle,
+  FaClock
 } from "react-icons/fa";
+
 
 export default function OwnerDashboardPage() {
   return (
@@ -31,37 +35,57 @@ export default function OwnerDashboardPage() {
 
         <nav className="flex-1 p-4 space-y-2">
 
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-violet-600">
-            <FaChartLine />
-            Dashboard
-          </button>
+  <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-violet-600">
+    <FaChartLine />
+    Dashboard
+  </button>
 
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition">
-            <FaCalendarCheck />
-            Reservas
-          </button>
+  <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition">
+    <FaBoxOpen />
+    Inventario
+  </button>
 
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition">
-            <FaChair />
-            Mesas
-          </button>
+  <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition">
+    <FaUtensils />
+    Platos
+  </button>
 
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition">
-            <FaUtensils />
-            Menú
-          </button>
+  <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition">
+    <FaClipboardList />
+    Menú
+  </button>
 
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition">
-            <FaBoxOpen />
-            Inventario
-          </button>
+  <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition">
+    <FaChair />
+    Mesas
+  </button>
 
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition">
-            <FaUsers />
-            Empleados
-          </button>
+  <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition">
+    <FaCalendarCheck />
+    Reservas
+  </button>
 
-        </nav>
+  <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition">
+    <FaDollarSign />
+    Pedidos
+  </button>
+
+  <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition">
+    <FaUsers />
+    Empleados
+  </button>
+
+  <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition">
+    <FaClock />
+    Turnos
+  </button>
+
+  <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 transition">
+    <FaUserCircle />
+    Perfil
+  </button>
+
+</nav>
 
         <div className="p-4 border-t border-slate-700">
 

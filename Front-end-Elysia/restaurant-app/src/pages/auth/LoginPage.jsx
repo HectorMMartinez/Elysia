@@ -10,13 +10,12 @@ import { loginValidation } from "../../validations/loginValidation";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
-
 export default function LoginPage() {
 
   const location = useLocation();
   const navigate = useNavigate();
   const { login } = useAuth();
- 
+
   const {
     register,
     handleSubmit,
@@ -36,17 +35,15 @@ export default function LoginPage() {
   setLoading(true);
 
   try {
-    
+   
 
     const res = await authService.login(data); 
-    
-
+   
     if (res.success) {
-     
       login(res.data); 
-      navigate("/dashboard");
+      navigate("/dashboard"); 
+     
     } else {
-      
       setAlert({
         show: true,
         type: "error",
@@ -55,7 +52,6 @@ export default function LoginPage() {
     }
 
   } catch (error) {
- 
 
     setAlert({
       show: true,
