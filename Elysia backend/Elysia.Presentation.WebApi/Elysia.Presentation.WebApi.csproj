@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\images\logoRestaurante\" />
+    <Folder Include="wwwroot\images\Platos\" />
     <Folder Include="wwwroot\images\productos\" />
     <Folder Include="wwwroot\images\profileImages\" />
   </ItemGroup>

@@ -12,8 +12,24 @@ namespace Elysia.Infraestructure.persistences.Repositories
 {
     public class ProductoRepository : GenericRepository<Producto>, IProductoRepository
     {
+        private readonly ElysiaContext context; 
+         
         public ProductoRepository(ElysiaContext appContext) : base(appContext)
         {
+            this.context = appContext;  
+        }
+
+        public async  Task<List<Producto>> GetByIdsAsync(IEnumerable<int> ids)
+        {
+            var products  = new List<Producto>();
+
+            foreach (var id in ids)
+            {
+                var product= await context.Set<Producto>().FindAsync(id);
+                products.Add(product);
+            }
+
+            return products;
         }
     }
 }
