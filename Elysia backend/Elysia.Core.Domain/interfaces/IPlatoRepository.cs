@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Elysia.Core.Domain.interfaces
 {
-    public interface IProductoRepository : IGenericRepository<Producto>
+    public interface IPlatoRepository : IGenericRepository<Plato>
     {
-        Task<List<Producto>> GetByIdsAsync(IEnumerable<int> ids);
+        Task<List<Plato?>> GetAllByPropietarioId(string propietarioId);
 
     }
 }

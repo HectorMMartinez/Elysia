@@ -4,6 +4,7 @@ using Elysia.Infraestructure.persistences.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Elysia.Infraestructure.persistences.Migrations
 {
     [DbContext(typeof(ElysiaContext))]
-    partial class ElysiaContextModelSnapshot : ModelSnapshot
+    [Migration("20260714193323_MigrationUpdated")]
+    partial class MigrationUpdated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -614,7 +617,7 @@ namespace Elysia.Infraestructure.persistences.Migrations
                     b.HasOne("Elysia.Core.Domain.Entities.Plato", "Plato")
                         .WithMany("PlatoProductos")
                         .HasForeignKey("PlatoId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Elysia.Core.Domain.Entities.Producto", "Producto")

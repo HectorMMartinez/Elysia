@@ -8,7 +8,7 @@ namespace Elysia.Core.Domain.Common
 {
     public enum PlatoEstado
     {
-        Disponoble  = 1,
+        Disponible  = 1,
         Agotado = 2,
     }
 }

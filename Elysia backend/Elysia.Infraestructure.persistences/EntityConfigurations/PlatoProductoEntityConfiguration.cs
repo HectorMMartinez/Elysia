@@ -27,13 +27,13 @@ namespace Elysia.Infraestructure.persistences.EntityConfigurations
             #region relationship configuration
             builder.HasOne(x => x.Producto)
                   .WithMany(c => c.PlatoProductos)
-                  .HasForeignKey(x => x.PlatoId)
+                  .HasForeignKey(x => x.ProductoId)
                   .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(x => x.Plato)
                    .WithMany(c => c.PlatoProductos)
                    .HasForeignKey(x => x.PlatoId)
-                   .OnDelete(DeleteBehavior.NoAction);
+                   .OnDelete(DeleteBehavior.Cascade);
             #endregion
         }
     }
