@@ -1,11 +1,6 @@
 ﻿using AutoMapper;
 using Elysia.Core.Application.Dtos.movimientoInventario;
 using Elysia.Core.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Elysia.Core.Application.Mapping.EntityToDtoMappingProfile
 {
@@ -13,11 +8,24 @@ namespace Elysia.Core.Application.Mapping.EntityToDtoMappingProfile
     {
         public MovimientoInventariotToDtoMappingProfile()
         {
-            CreateMap<MovimientoInventario, CrearMovimientoInventarioResponseDto>()
-                .ReverseMap();
+            CreateMap<
+                MovimientoInventario,
+                CrearMovimientoInventarioResponseDto
+            >();
 
-            CreateMap<CrearMovimientoInventarioDto,CrearMovimientoInvetarioRequestDto>()
-                .ReverseMap();
+            CreateMap<
+                CrearMovimientoInvetarioRequestDto,
+                CrearMovimientoInventarioDto
+            >();
+
+            CreateMap<
+                CrearMovimientoInventarioDto,
+                MovimientoInventario
+            >()
+            .ForMember(
+                destino => destino.FechaMovimiento,
+                opcion => opcion.MapFrom(_ => DateTime.Now)
+            );
         }
     }
 }

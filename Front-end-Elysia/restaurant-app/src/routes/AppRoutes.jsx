@@ -6,7 +6,10 @@ import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "../pages/auth/ResetPasswordPage";
 import ConfirmAccountPage from "../pages/auth/ConfirmAccountPage";
 import OwnerDashboardPage from "../pages/dashboard/OwnerDashboardPage";
+import InventoryPage from "../pages/inventory/InventoryPage";
+
 import PrivateRoute from "./PrivateRoute";
+
 
 export default function AppRoutes() {
   return (
@@ -27,6 +30,15 @@ export default function AppRoutes() {
           element={
             <PrivateRoute>
               <OwnerDashboardPage />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/inventario"
+          element={
+            <PrivateRoute>
+              <InventoryPage />
             </PrivateRoute>
           }
         />

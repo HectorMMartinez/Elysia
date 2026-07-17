@@ -27,42 +27,66 @@ namespace Elysia.Core.Application.Services
 
         }
 
-        public override async Task<CrearMovimientoInventarioResponseDto?> AddAsync(CrearMovimientoInventarioDto? entity)
+        public override async Task<CrearMovimientoInventarioResponseDto?> AddAsync(
+     CrearMovimientoInventarioDto? entity
+ )
         {
-            var response = new CrearMovimientoInventarioResponseDto() { HasError = false, Errors = [] };
+            var response = new CrearMovimientoInventarioResponseDto
+            {
+                HasError = false,
+                Errors = []
+            };
 
             try
             {
                 if (entity == null)
                 {
                     response.HasError = true;
-                    response.Errors.Add("No se indicaron los valores del movimiento correctamente");
-                    return response;
+                    response.Errors.Add(
+                        "No se indicaron correctamente los valores del movimiento."
+                    );
 
-                }
-
-                var producto = await productoRepository.GetByIdAsync(entity.ProductoId);
-
-                if(producto == null)
-                {
-                    response.HasError = true;
-                    response.Errors.Add("No se encontro el producto especificado, no puede registrar el movimiento");
                     return response;
                 }
 
-                if (entity.Cantidad > producto.StockActual)
+                var producto = await productoRepository.GetByIdAsync(
+                    entity.ProductoId
+                );
+
+                if (producto == null)
                 {
                     response.HasError = true;
-                    response.Errors.Add("la cantidad del movimiento no puede ser mayor que el stock del producto");
+                    response.Errors.Add(
+                        "No se encontró el producto especificado. No se puede registrar el movimiento."
+                    );
+
                     return response;
                 }
 
-
-
-                if (!Enum.IsDefined(typeof(TipoMovimientoInventario), entity.TipoMovimiento))
+                if (!Enum.IsDefined(
+                        typeof(TipoMovimientoInventario),
+                        entity.TipoMovimiento
+                    ))
                 {
                     response.HasError = true;
-                    response.Errors.Add("El tipo de movimiento indicado es incorrecto");
+                    response.Errors.Add(
+                        "El tipo de movimiento indicado es incorrecto."
+                    );
+
+                    return response;
+                }
+
+                // Esta validación solo corresponde a las salidas.
+                if (
+                    entity.TipoMovimiento == TipoMovimientoInventario.Salida &&
+                    entity.Cantidad > producto.StockActual
+                )
+                {
+                    response.HasError = true;
+                    response.Errors.Add(
+                        "La cantidad de salida no puede ser mayor que el stock actual del producto."
+                    );
+
                     return response;
                 }
 
@@ -70,25 +94,27 @@ namespace Elysia.Core.Application.Services
                 {
                     producto.StockActual += entity.Cantidad;
                 }
-                else if(entity.TipoMovimiento == TipoMovimientoInventario.Salida)
+                else
                 {
                     producto.StockActual -= entity.Cantidad;
                 }
 
+                await productoRepository.UpdateAsync(
+                    entity.ProductoId,
+                    producto
+                );
 
+                var movimientoCreado = await base.AddAsync(entity);
 
-                await productoRepository.UpdateAsync(entity.ProductoId,producto);
-                var data = await base.AddAsync(entity);
-                var map = _mapper.Map<CrearMovimientoInventarioResponseDto>(data);
-                return map;
+                return movimientoCreado;
             }
             catch (Exception ex)
             {
-                throw new NotImplementedException("Ocurrio un error al intentar registrar el movimiento en el inventario");
+                throw new InvalidOperationException(
+                    "Ocurrió un error al intentar registrar el movimiento en el inventario.",
+                    ex
+                );
             }
         }
-
-
-
     }
 }
