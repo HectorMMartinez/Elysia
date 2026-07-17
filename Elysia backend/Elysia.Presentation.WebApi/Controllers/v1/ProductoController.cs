@@ -98,45 +98,73 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         [HttpPut("edit-product/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProductoResponseDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> EditarProducto(int id,[FromForm]EditarProductoRequestDto? dto)
+        public async Task<ActionResult> EditarProducto(
+    int id,
+    [FromForm] EditarProductoRequestDto? dto
+)
         {
             try
             {
+                if (id <= 0)
+                {
+                    return BadRequest("Debes indicar un producto válido.");
+                }
+
                 if (dto == null)
                 {
-                    return BadRequest("Debes ingresar los valores del producto correctamente");
+                    return BadRequest(
+                        "Debes ingresar los valores del producto correctamente."
+                    );
                 }
+
+                var productoActual = await service.GetByIdAsync(id);
+
+                if (productoActual == null)
+                {
+                    return NotFound(
+                        "Producto no encontrado, no se encontró el producto a editar."
+                    );
+                }
+
                 var propietarioId = User.FindFirst("UId")!.Value;
                 var map = _mapper.Map<EditarProductoDto>(dto);
-                if (dto.Imagen != null) {
-                    map.Imagen = FileHandler.Upload(dto.Imagen, propietarioId, "productos", true);
+
+                map.Id = id;
+                map.IdPropietario = productoActual.IdPropietario;
+
+                if (dto.Imagen != null)
+                {
+                    map.Imagen = FileHandler.Upload(
+                        dto.Imagen,
+                        propietarioId,
+                        "productos",
+                        true
+                    );
                 }
                 else
                 {
-                    map.Imagen = "";
+                    // Conserva la imagen que ya tenía el producto.
+                    map.Imagen = productoActual.Imagen;
                 }
 
-                    var response = await service.UpdateAsync(id, map);
+                var response = await service.UpdateAsync(id, map);
+
                 if (response != null && response.HasError)
                 {
                     return BadRequest(response.Errors.FirstOrDefault());
                 }
 
-
-
                 return Ok(response);
-
-
             }
             catch (Exception ex)
             {
-
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-
-
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    ex.InnerException?.Message ?? ex.Message
+                );
             }
-
         }
 
 

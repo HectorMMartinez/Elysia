@@ -1,154 +1,242 @@
 ﻿using AutoMapper;
 using Elysia.Core.Application.Dtos.producto;
-using Elysia.Core.Application.Dtos.Tarjeta;
 using Elysia.Core.Application.Interfaces;
 using Elysia.Core.Domain.Entities;
-using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.JSInterop.Infrastructure;
 using ReservaBook.Core.Domain.Interfaces;
-using System.Xml;
 
 namespace Elysia.Core.Application.Services
 {
-    public class productoService : GenericService<Producto, ProductoResponseDto, EditarProductoDto, CreateProductoDto>, IProductoService
+    public class productoService
+        : GenericService<
+            Producto,
+            ProductoResponseDto,
+            EditarProductoDto,
+            CreateProductoDto
+        >,
+        IProductoService
     {
-         
+        private readonly IMapper mapper;
+        private readonly IGenericRepository<Producto> productoRepository;
 
-         private readonly IMapper mapper;
-
-        public productoService(IGenericRepository<Producto> genericRepository, IMapper _mapper) : base(genericRepository, _mapper)
+        public productoService(
+            IGenericRepository<Producto> genericRepository,
+            IMapper mapper
+        ) : base(genericRepository, mapper)
         {
-            mapper = _mapper;
+            this.mapper = mapper;
+            productoRepository = genericRepository;
         }
 
-
-        public override async Task<ProductoResponseDto?> AddAsync(CreateProductoDto? dto)
+        public override async Task<ProductoResponseDto?> AddAsync(
+            CreateProductoDto? dto
+        )
         {
-        
-            var response = new ProductoResponseDto() { HasError = false, Errors = [] };
+            var response = new ProductoResponseDto
+            {
+                HasError = false,
+                Errors = []
+            };
 
             try
             {
-                if (dto == null) 
-                {
-                    response.HasError = true;
-                    response.Errors.Add("Los valores del producto no fueron correctamente indicado");
-                    return response;
-         
-                }
-
-                if(dto.UnidadMedida != null && dto.UnidadMedida.Length > 4)
-                {
-                    response.HasError |= true;
-                    response.Errors.Add("La unidad de medida del producto no puede superar los 4 digitos, unidad de medida invalida");
-                    return response;
-                }
-
-
-                if(dto.StockMinimo > dto.StockActual)
-                {
-                    response.HasError = true;
-                    response.Errors.Add("El stock minimo no puede ser menor al stock original o actual");
-                    return response;
-                }
-
-
-         
-                dto.FechaCreacion = DateTime.Now;
-                dto.Activo = true;
-                var data = await base.AddAsync(dto);
-                var map = mapper.Map<ProductoResponseDto>(data);
-                return map;
-
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception($"Ocurrio un error al intentar agregar el producto:{ex.Message}");
-            
-            }
-
-        
-        
-        
-        
-        }
-
-
-
-
-        public override async Task<ProductoResponseDto?> UpdateAsync(int id,EditarProductoDto? dto)
-        {
-
-            var response = new ProductoResponseDto() { HasError = false, Errors = [] };
-
-            try
-            {
-
-                var producto = await base.GetByIdAsync(id);
-
-                if(producto == null)
-                {
-                    response.HasError = true;
-                    response.Errors.Add("Producto no encontrado, no se encontro el producto ha editar");
-                    return response;
-                }
-
-
                 if (dto == null)
                 {
                     response.HasError = true;
-                    response.Errors.Add("Los valores del producto no fueron correctamente indicado");
-                    return response;
+                    response.Errors.Add(
+                        "Los valores del producto no fueron indicados correctamente."
+                    );
 
+                    return response;
                 }
 
-                if (dto.UnidadMedida != null && dto.UnidadMedida.Length > 4)
+                if (
+                    string.IsNullOrWhiteSpace(dto.UnidadMedida) ||
+                    dto.UnidadMedida.Length > 4
+                )
                 {
-                    response.HasError |= true;
-                    response.Errors.Add("La unidad de medida del producto no puede superar los 4 digitos, unidad de medida invalida");
+                    response.HasError = true;
+                    response.Errors.Add(
+                        "La unidad de medida del producto no puede superar los 4 caracteres."
+                    );
+
                     return response;
                 }
 
+                if (dto.StockActual <= 0)
+                {
+                    response.HasError = true;
+                    response.Errors.Add(
+                        "El stock actual debe ser mayor que cero."
+                    );
+
+                    return response;
+                }
+
+                if (dto.StockMinimo <= 0)
+                {
+                    response.HasError = true;
+                    response.Errors.Add(
+                        "El stock mínimo debe ser mayor que cero."
+                    );
+
+                    return response;
+                }
 
                 if (dto.StockMinimo > dto.StockActual)
                 {
                     response.HasError = true;
-                    response.Errors.Add("El stock minimo no puede ser menor al stock original o actual");
+                    response.Errors.Add(
+                        "El stock mínimo no puede ser mayor que el stock actual."
+                    );
+
                     return response;
                 }
 
-               
+                dto.FechaCreacion = DateTime.Now;
+                dto.Activo = true;
 
-                dto.StockMinimo = dto.StockMinimo > 0 ? dto.StockMinimo : producto.StockMinimo;
-                dto.StockActual = dto.StockActual > 0 ? dto.StockActual : producto.StockActual;
-                dto.Activo = dto.Activo ? dto.Activo : producto.Activo;
-                dto.Nombre = !string.IsNullOrEmpty(dto.Nombre) ? dto.Nombre : producto.Nombre;
-                dto.Descripcion = !string.IsNullOrEmpty(dto.Descripcion)  ? dto.Descripcion : producto.Descripcion;
-                dto.UnidadMedida = !string.IsNullOrEmpty(dto.UnidadMedida) ? dto.UnidadMedida : producto.UnidadMedida;
-                dto.IdPropietario = producto.IdPropietario; 
-                dto.Id = id;
+                var productoCreado = await base.AddAsync(dto);
 
-
-                var data = await base.UpdateAsync(id,dto);
-                return data;
-
+                return productoCreado;
             }
             catch (Exception ex)
             {
-
-                throw new Exception($"Ocurrio un error al intentar editar el producto:{ex.Message}");
-
+                throw new InvalidOperationException(
+                    $"Ocurrió un error al intentar agregar el producto: {ex.Message}",
+                    ex
+                );
             }
-
-
-
-
-
         }
 
+        public override async Task<ProductoResponseDto?> UpdateAsync(
+            int id,
+            EditarProductoDto? dto
+        )
+        {
+            var response = new ProductoResponseDto
+            {
+                HasError = false,
+                Errors = []
+            };
 
+            try
+            {
+                if (id <= 0)
+                {
+                    response.HasError = true;
+                    response.Errors.Add(
+                        "Debes indicar un producto válido."
+                    );
 
+                    return response;
+                }
 
+                if (dto == null)
+                {
+                    response.HasError = true;
+                    response.Errors.Add(
+                        "Los valores del producto no fueron indicados correctamente."
+                    );
+
+                    return response;
+                }
+
+                var productoActual =
+                    await productoRepository.GetByIdAsync(id);
+
+                if (productoActual == null)
+                {
+                    response.HasError = true;
+                    response.Errors.Add(
+                        "Producto no encontrado, no se encontró el producto a editar."
+                    );
+
+                    return response;
+                }
+
+                if (
+                    string.IsNullOrWhiteSpace(dto.UnidadMedida) ||
+                    dto.UnidadMedida.Length > 4
+                )
+                {
+                    response.HasError = true;
+                    response.Errors.Add(
+                        "La unidad de medida del producto no puede superar los 4 caracteres."
+                    );
+
+                    return response;
+                }
+
+                if (dto.StockActual <= 0)
+                {
+                    response.HasError = true;
+                    response.Errors.Add(
+                        "El stock actual debe ser mayor que cero."
+                    );
+
+                    return response;
+                }
+
+                if (dto.StockMinimo <= 0)
+                {
+                    response.HasError = true;
+                    response.Errors.Add(
+                        "El stock mínimo debe ser mayor que cero."
+                    );
+
+                    return response;
+                }
+
+                if (dto.StockMinimo > dto.StockActual)
+                {
+                    response.HasError = true;
+                    response.Errors.Add(
+                        "El stock mínimo no puede ser mayor que el stock actual."
+                    );
+
+                    return response;
+                }
+
+                // Solo se actualizan los campos editables.
+                productoActual.Nombre = dto.Nombre.Trim();
+                productoActual.Descripcion = dto.Descripcion.Trim();
+                productoActual.UnidadMedida =
+                    dto.UnidadMedida.Trim();
+                productoActual.StockActual = dto.StockActual;
+                productoActual.StockMinimo = dto.StockMinimo;
+                productoActual.Activo = dto.Activo;
+
+                // Solo reemplaza la imagen cuando se envía una nueva.
+                if (!string.IsNullOrWhiteSpace(dto.Imagen))
+                {
+                    productoActual.Imagen = dto.Imagen;
+                }
+
+                /*
+                 * No se modifica:
+                 * productoActual.FechaCreacion
+                 * productoActual.IdPropietario
+                 *
+                 * De esta manera se conservan sus valores originales.
+                 */
+
+                var productoActualizado =
+                    await productoRepository.UpdateAsync(
+                        id,
+                        productoActual
+                    );
+
+                return mapper.Map<ProductoResponseDto>(
+                    productoActualizado
+                );
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException(
+                    $"Ocurrió un error al intentar editar el producto: {ex.Message}",
+                    ex
+                );
+            }
+        }
     }
 }
