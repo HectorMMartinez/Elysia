@@ -57,6 +57,7 @@ namespace Elysia.Infraestructure.persistences
             Service.AddScoped<IMovimientoRepository, MovimientoInventarioRepository>();
             Service.AddScoped<IPlatoRepository, PlatoRepository>();
             Service.AddScoped<IPlatoProductoRepository, PlatoProductoRepository>();
+            Service.AddScoped<IMesaRepository, MesaRepository>();
             #endregion
 
         }

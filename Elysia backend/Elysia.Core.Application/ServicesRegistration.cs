@@ -30,6 +30,7 @@ namespace Elysia.Core.Application
             services.AddScoped<ICategoriaPlatoService, CategoriaPlatoService>();
             services.AddScoped<IMovimientoInventarioService, MovimientoInventarioService>();
             services.AddScoped<IPlatoService, PlatoService>();
+            services.AddScoped<IMesaService, MesaService>();
             #endregion
 
 
