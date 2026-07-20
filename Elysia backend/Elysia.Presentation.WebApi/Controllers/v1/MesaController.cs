@@ -3,11 +3,13 @@ using AutoMapper;
 using Elysia.Core.Application.Dtos.Mesa;
 using Elysia.Core.Application.Interfaces;
 using Elysia.Presentation.WebApi.Handlers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Elysia.Presentation.WebApi.Controllers.v1
 {
     [ApiVersion("1.0")]
+    [Authorize(Roles = "Propietario")]
     public class MesaController : BaseApiController
     {
         private readonly IMesaService service;
@@ -145,14 +147,23 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
 
                 var map = _Mapper.Map<EditarMesaDto>(dto);
                 map.FechaActualizacion = DateTime.Now;
-
+                var mesa = await service.GetByIdAsync(id);
+                if (mesa == null)
+                {
+                    return BadRequest("No se encontro una mesa con ese id");
+                }
                 if (dto.Imagen != null)
                 {
                     map.Imagen = FileHandler.Upload(dto.Imagen, PropietarioId, "Mesas", true);
                 }
+                else
+                {
+                    map.Imagen = mesa.Imagen;
+                }
 
 
-                var data = await service.UpdateAsync(id,map);
+
+                    var data = await service.UpdateAsync(id, map);
 
                 if (data != null && data.HasError)
                 {
