@@ -184,6 +184,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
 
         [HttpDelete("delete-by-id/{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -208,7 +209,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
 
                 var data = await service.DeleteAsync(id);
                 FileHandler.DeleteImage(mesa.Imagen);
-                return NoContent();
+                return Ok("Mesa eliminada correctamente");
             }
             catch (Exception ex)
             {
@@ -218,6 +219,8 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
 
             }
         }
+
+
 
 
         #region private method

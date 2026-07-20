@@ -1,18 +1,17 @@
-﻿using System;
+﻿using Elysia.Core.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Elysia.Core.Domain.Entities
+namespace Elysia.Core.Application.Dtos.platoMenu
 {
-    public class PlatoMenu 
+    public class CreatePlatoMenuDto
     {
         public int Id { get; set; }
         public int IdPlato { get; set; }
-        public Plato? Plato { get; set; } 
         public int IdMenu { get; set; }
-        public Menu? Menu { get; set; } 
-       
     }
 }
+

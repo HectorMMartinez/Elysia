@@ -1,5 +1,6 @@
 ﻿using Elysia.Core.Application.Interfaces;
 using Elysia.Core.Application.Services;
+using Elysia.Core.Domain.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,8 @@ namespace Elysia.Core.Application
             services.AddScoped<IMovimientoInventarioService, MovimientoInventarioService>();
             services.AddScoped<IPlatoService, PlatoService>();
             services.AddScoped<IMesaService, MesaService>();
+            services.AddScoped<IMenuService, MenuServices>();
+            services.AddScoped<IPlatoMenuService, PlatoMenuService>();
             #endregion
 
 
