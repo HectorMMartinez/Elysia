@@ -19,7 +19,7 @@ namespace Elysia.Core.Application.Dtos.Mesa
         public MesaEstado Estado { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Debes ingresar la capacidad de la mesa (cantidad de personas)")]
         public int Capacidad { get; set; }
-        [Required(ErrorMessage = "Debes ingresar la imagen de la mesa ")]
+         //editar la imagen una mesa es opcional
         public IFormFile? Imagen { get; set; }
     }
 }
