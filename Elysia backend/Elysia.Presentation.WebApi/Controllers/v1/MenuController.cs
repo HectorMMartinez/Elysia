@@ -10,7 +10,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
 {
     [ApiVersion("1.0")]
     [Authorize(Roles = "Propietario")]
-    public class MenuController : Controller
+    public class MenuController : BaseApiController
     {
         private readonly IMapper mapper;
         private readonly IMenuService menuService;

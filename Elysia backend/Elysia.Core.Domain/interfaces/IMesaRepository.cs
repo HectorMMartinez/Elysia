@@ -12,6 +12,7 @@ namespace Elysia.Core.Domain.interfaces
     {
 
         Task<List<Mesa>> GetAllByPropietarioId(string propietarioId);
+        Task<List<Mesa>> GetAllDisponibleByPropietarioId(string propietarioId);
 
 
 

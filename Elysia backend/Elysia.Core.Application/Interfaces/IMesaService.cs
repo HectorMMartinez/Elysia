@@ -11,6 +11,7 @@ namespace Elysia.Core.Application.Interfaces
     public interface IMesaService : IGenericService<Mesa,MesaResponseDto,EditarMesaDto,CreateMesaDto>
     {
         Task<List<Mesa?>> GetAllByPropietarioIdAsync(string propietarioId);
+        Task<List<Mesa?>> GetAllDisponibleByPropietarioId(string propietarioId);
 
     }
 

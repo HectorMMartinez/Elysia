@@ -9,8 +9,9 @@ namespace Elysia.Core.Domain.Common
     public enum EstadoReserva
     {
         Activa = 1,
-        Finalizada = 2,
-        Cancelada = 3,
-        NoAsistio = 4
+        EnProceso = 2,
+        Finalizada = 3,
+        Cancelada = 4,
+        NoAsistio = 5
     }
 }
