@@ -53,6 +53,40 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         }
 
 
+
+        [HttpGet("get-all-disponibles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAllDisponibles()
+        {
+            try
+            {
+                var id = User.FindFirst("UId")!.Value;
+                var data = await service.GetAllDisponibleByPropietarioId(id);
+
+                if (data == null || data.Count == 0)
+                {
+                    return NotFound("No se encontraron mesas registradas con estados disponible");
+                }
+
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+
+
+            }
+        }
+
+
+
+
+
+
+
         [HttpGet("get-by-id/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

@@ -60,6 +60,7 @@ namespace Elysia.Infraestructure.persistences
             Service.AddScoped<IMesaRepository, MesaRepository>();
             Service.AddScoped<IMenuRepository, MenuRepository>();
             Service.AddScoped<IPlatoMenuRepository, PlatoMenuRepository>();
+            Service.AddScoped<IReservasRepository, ReservasRepository>();
             #endregion
 
         }

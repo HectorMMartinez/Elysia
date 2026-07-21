@@ -23,7 +23,6 @@ namespace Elysia.Core.Application.Services
 
         public  async Task<List<Mesa?>> GetAllByPropietarioIdAsync(string propietarioId)
         {
-            var response = new MesaResponseDto() { HasError = false, Errors = [] };
             try
             {
 
@@ -47,6 +46,33 @@ namespace Elysia.Core.Application.Services
 
         }
 
+
+
+
+        public async  Task<List<Mesa?>> GetAllDisponibleByPropietarioId(string propietarioId)
+        {
+
+            try
+            {
+
+                var data = await mesaRepository.GetAllDisponibleByPropietarioId(propietarioId);
+
+                if (data.Any())
+                {
+                    return data;
+                }
+
+                return [];
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception($"Ocurrio un error al intentar obtener las mesas disponibles:{ex.Message}");
+
+            }
+
+        }
 
 
 

@@ -1,4 +1,5 @@
-﻿using Elysia.Core.Domain.Entities;
+﻿using Elysia.Core.Domain.Common;
+using Elysia.Core.Domain.Entities;
 using Elysia.Core.Domain.interfaces;
 using Elysia.Infraestructure.persistences.Contexts;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +36,16 @@ namespace Elysia.Infraestructure.persistences.Repositories
         }
 
 
+        public async Task<List<Mesa>> GetAllDisponibleByPropietarioId(string propietarioId)
+        {
+            var mesasDisponibles = await context.Set<Mesa>().Where(x => x.IdPropietario == propietarioId && x.Estado == MesaEstado.Disponible || x.Estado == MesaEstado.Reservada).ToListAsync();
 
+            if (mesasDisponibles.Any())
+            {
+                return mesasDisponibles;
+            }
+
+            return [];
+        }
     }
 }
