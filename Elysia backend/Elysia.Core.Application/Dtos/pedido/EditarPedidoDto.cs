@@ -5,23 +5,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Elysia.Core.Domain.Entities
+namespace Elysia.Core.Application.Dtos.pedido
 {
-    public class Pedido 
+    public class EditarPedidoDto
     {
-        public int Id { get; set; } 
+        public int Id { get; set; }
         public string IdPropietario { get; set; } = string.Empty;
         public int IdMesa { get; set; }
         public DateTime FechaCreacion { get; set; }
         public DateTime FechaActualizacion { get; set; }
-        public EstadoPedido Estado {  get; set; }
-        public decimal Total { get; set; }
-
-
-
-        //navigation property
-        public Mesa Mesa { get; set; } = new Mesa();
-        public ICollection<DetallesPedido> DetallesPedidos { get; set; } = new List<DetallesPedido>();  
+        public EstadoPedido Estado { get; set; }
+        public List<CreateDetallesPedidoRequestDto> DetallesPedidoDtos { get; set; } = new List<CreateDetallesPedidoRequestDto>();
 
     }
 }

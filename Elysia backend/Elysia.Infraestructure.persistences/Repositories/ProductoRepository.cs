@@ -1,6 +1,7 @@
 ﻿using Elysia.Core.Domain.Entities;
 using Elysia.Core.Domain.interfaces;
 using Elysia.Infraestructure.persistences.Contexts;
+using Microsoft.EntityFrameworkCore;
 using ReservaBook.Core.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -31,5 +32,22 @@ namespace Elysia.Infraestructure.persistences.Repositories
 
             return products;
         }
+
+        public async  Task<List<Producto>?> UpdateRangeAsync(List<Producto> products)
+        {
+            if(products.Count == 0 || !products.Any())
+            {
+                return [];
+            }
+
+
+           context.Set<Producto>().UpdateRange(products);
+           await context.SaveChangesAsync();
+           return products;
+           
+        }
+
+
+      
     }
 }
