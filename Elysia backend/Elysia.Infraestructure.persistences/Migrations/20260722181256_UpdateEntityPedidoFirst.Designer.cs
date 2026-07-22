@@ -4,6 +4,7 @@ using Elysia.Infraestructure.persistences.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Elysia.Infraestructure.persistences.Migrations
 {
     [DbContext(typeof(ElysiaContext))]
-    partial class ElysiaContextModelSnapshot : ModelSnapshot
+    [Migration("20260722181256_UpdateEntityPedidoFirst")]
+    partial class UpdateEntityPedidoFirst
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

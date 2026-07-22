@@ -54,7 +54,7 @@ namespace Elysia.Core.Application.Services
                     {
                         if(reserva.Estado == EstadoReserva.Activa || reserva.Estado == EstadoReserva.EnProceso)
                         {
-                            if(reserva.FechaReserva == dto.FechaReserva)
+                            if(reserva.FechaReserva == dto.FechaReserva || reserva.FechaReserva.AddHours(4) == dto.FechaReserva)
                             {
                                 response.HasError = true;
                                 response.Errors.Add("La reserva no  se puede realizar, esa mesa  esta reservada para la fecha indicada");
@@ -161,7 +161,7 @@ namespace Elysia.Core.Application.Services
                     {
                         if (_reserva.Estado == EstadoReserva.Activa || _reserva.Estado == EstadoReserva.EnProceso)
                         {
-                            if (_reserva.FechaReserva == dto.FechaReserva)
+                            if (_reserva.FechaReserva == dto.FechaReserva || reserva.FechaReserva.AddHours(4) == dto.FechaReserva)
                             {
                                 response.HasError = true;
                                 response.Errors.Add("La reserva no  se puede realizar, esa mesa  esta reservada para la fecha indicada");
