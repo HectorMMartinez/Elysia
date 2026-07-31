@@ -15,6 +15,7 @@ namespace Elysia.Core.Domain.interfaces
         Task<List<PlatoProducto>> AddRangeAsync(List<PlatoProducto> platoProductos);
         Task<List<PlatoProducto?>> GetByPlatoId(int productId);
         Task<List<PlatoProducto>> UpdateRangeAsync(int platoId, List<PlatoProducto> platoProductos);
+        Task<List<PlatoProducto>> ReplaceByPlatoIdAsync(int platoId, List<PlatoProducto> platoProductos);
 
 
     }

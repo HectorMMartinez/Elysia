@@ -66,6 +66,12 @@ namespace Elysia.Core.Application.Services
 
                 }
 
+                var validation = await ValidarCategoriaYProductosAsync(dto.CategoriaId, dto.ProductoQuantityDtos);
+                if (validation.HasError)
+                {
+                    return validation;
+                }
+
                 var plato = await base.AddAsync(dto);
                 var listPlatoProductos = new List<PlatoProducto>();
                 foreach (var item in dto.ProductoQuantityDtos)
@@ -75,6 +81,7 @@ namespace Elysia.Core.Application.Services
                 }
                 await platoProductoRepository.AddRangeAsync(listPlatoProductos);
                 var map = _mapper.Map<PlatoResponseDto>(plato);
+                map.ProductoQuantityDtos = dto.ProductoQuantityDtos;
                 return map;
             }
             catch (Exception ex)
@@ -120,34 +127,29 @@ namespace Elysia.Core.Application.Services
                     return response;
                 }
 
-                var platoProducto = await platoProductoRepository.GetByPlatoId(plato.Id);
-
-                if (platoProducto == null || platoProducto.Count == 0)
+                if (dto.ProductoQuantityDtos == null || dto.ProductoQuantityDtos.Count == 0)
                 {
                     response.HasError = true;
-                    response.Errors.Add("no se econtraron los productos para este plato");
+                    response.Errors.Add("no se han seleccionado los productos para el plato, no puedes editarlo");
                     return response;
                 }
-                var actualizar = new List<PlatoProducto>();
 
-                if (dto.ProductoQuantityDtos != null && dto.ProductoQuantityDtos.Count > 0)
+                var validation = await ValidarCategoriaYProductosAsync(dto.CategoriaId, dto.ProductoQuantityDtos);
+                if (validation.HasError)
                 {
-                    foreach (var existente in platoProducto)
-                    {
-                        var dtoProducto = dto.ProductoQuantityDtos
-                            .FirstOrDefault(x => x.Id == existente.ProductoId);
-
-                        if (dtoProducto != null)
-                        {
-                            existente.Cantidad = dtoProducto.Cantidad;
-                        }
-                    }
-
-                    await platoProductoRepository.UpdateRangeAsync(plato.Id,platoProducto!);
-
+                    return validation;
                 }
 
+                var platoProductos = dto.ProductoQuantityDtos
+                    .Select(item => new PlatoProducto
+                    {
+                        PlatoId = plato.Id,
+                        ProductoId = item.Id,
+                        Cantidad = item.Cantidad
+                    })
+                    .ToList();
 
+                await platoProductoRepository.ReplaceByPlatoIdAsync(plato.Id, platoProductos);
 
 
                 dto.Estado = !string.IsNullOrEmpty(dto.Estado.ToString()) ? dto.Estado : plato.Estado;
@@ -157,17 +159,13 @@ namespace Elysia.Core.Application.Services
                 dto.Precio = dto.Precio > 0 ? dto.Precio : plato.Precio;
                 dto.Imagen = !string.IsNullOrEmpty(dto.Imagen) ? dto.Imagen : plato.Imagen;
                 dto.IdPropietario = plato.IdPropietario;
-                dto.CategoriaId = plato.CategoriaId;
+                dto.CategoriaId = dto.CategoriaId > 0 ? dto.CategoriaId : plato.CategoriaId;
                 dto.Codigo = plato.Codigo;
                 dto.Fecha = plato.Fecha;
-                dto.ProductoQuantityDtos = dto.ProductoQuantityDtos!.Count > 0 ? dto.ProductoQuantityDtos : platoProducto.Select(s => new productoQuantityDto()
-                {
-                    Id = s.ProductoId,
-                    Cantidad = s.Cantidad
-                }).ToList();
 
                 var data = await base.UpdateAsync(id, dto);
                 var map = _mapper.Map<PlatoResponseDto>(data);
+                map.ProductoQuantityDtos = dto.ProductoQuantityDtos;
                 return map;
             }
             catch (Exception ex)
@@ -221,6 +219,7 @@ namespace Elysia.Core.Application.Services
                 p => p.Id,
                 (pp, p) => new PlatoProductoDataDto
                 {
+                 ProductoId = p.Id,
                  NombreProducto = p.Nombre,
                  CantidaProducto = pp.Cantidad
                 }).ToList();
@@ -273,6 +272,7 @@ namespace Elysia.Core.Application.Services
                         p => p.Id,
                         (pp, p) => new PlatoProductoDataDto
                         {
+                            ProductoId = p.Id,
                             NombreProducto = p.Nombre,
                             CantidaProducto = pp.Cantidad
                         })
@@ -280,6 +280,53 @@ namespace Elysia.Core.Application.Services
             };
 
             return dto;
+        }
+
+
+        private async Task<PlatoResponseDto> ValidarCategoriaYProductosAsync(
+            int categoriaId,
+            List<productoQuantityDto> productos)
+        {
+            var response = new PlatoResponseDto() { HasError = false, Errors = [] };
+
+            var categoria = await categoriaPlatoRepository.GetByIdAsync(categoriaId);
+            if (categoria == null)
+            {
+                response.HasError = true;
+                response.Errors.Add("Debes seleccionar una categoria valida para el plato");
+                return response;
+            }
+
+            if (productos.Any(x => x.Id <= 0 || x.Cantidad <= 0))
+            {
+                response.HasError = true;
+                response.Errors.Add("Debes indicar productos existentes y cantidades mayores que cero");
+                return response;
+            }
+
+            var productosDuplicados = productos
+                .GroupBy(x => x.Id)
+                .Any(x => x.Count() > 1);
+
+            if (productosDuplicados)
+            {
+                response.HasError = true;
+                response.Errors.Add("No puedes repetir productos dentro del mismo plato");
+                return response;
+            }
+
+            var productosEncontrados = await productoRepository.GetByIdsAsync(
+                productos.Select(x => x.Id));
+
+            if (productosEncontrados.Any(x => x == null) ||
+                productosEncontrados.Count != productos.Count)
+            {
+                response.HasError = true;
+                response.Errors.Add("Uno o mas productos indicados no existen en el inventario");
+                return response;
+            }
+
+            return response;
         }
 
 

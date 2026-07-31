@@ -7,6 +7,7 @@ import ResetPasswordPage from "../pages/auth/ResetPasswordPage";
 import ConfirmAccountPage from "../pages/auth/ConfirmAccountPage";
 import OwnerDashboardPage from "../pages/dashboard/OwnerDashboardPage";
 import InventoryPage from "../pages/inventory/InventoryPage";
+import PlatosPage from "../pages/dishes/PlatosPage";
 
 import PrivateRoute from "./PrivateRoute";
 
@@ -39,6 +40,15 @@ export default function AppRoutes() {
           element={
             <PrivateRoute>
               <InventoryPage />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/platos"
+          element={
+            <PrivateRoute>
+              <PlatosPage />
             </PrivateRoute>
           }
         />

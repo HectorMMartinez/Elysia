@@ -20,6 +20,18 @@ const ENDPOINTS = {
   ADD_ENTRADA: "/Producto/add-entrada",
   ADD_SALIDA: "/Producto/add-salida",
 },
+
+  PLATO: {
+    GET_ALL_WITH_INGREDIENTS: "/Plato/get-all-con-ingredientes",
+    GET_BY_ID_WITH_INGREDIENTS: "/Plato/get-by-id-con-ingrediente",
+    CREATE: "/Plato/add-plato",
+    UPDATE: "/Plato/update-Plato",
+    DELETE: "/Plato/delete-by-id",
+  },
+
+  CATEGORIA_PLATO: {
+    GET_ALL: "/CategoriaPlato/get-all-categoriaPlatos",
+  },
 };
 
 export default ENDPOINTS;
