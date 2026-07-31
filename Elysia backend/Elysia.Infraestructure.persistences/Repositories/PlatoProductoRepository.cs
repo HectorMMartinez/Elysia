@@ -72,6 +72,27 @@ namespace Elysia.Infraestructure.persistences.Repositories
         }
 
 
+        public async Task<List<PlatoProducto>> ReplaceByPlatoIdAsync(int platoId, List<PlatoProducto> platoProductos)
+        {
+            if (platoProductos == null || platoProductos.Count == 0)
+            {
+                return [];
+            }
+
+            var dataPlatoProducto = await context.Set<PlatoProducto>()
+                .Where(x => x.PlatoId == platoId)
+                .ToListAsync();
+
+            if (dataPlatoProducto.Count > 0)
+            {
+                context.Set<PlatoProducto>().RemoveRange(dataPlatoProducto);
+            }
+
+            await context.Set<PlatoProducto>().AddRangeAsync(platoProductos);
+            await context.SaveChangesAsync();
+            return platoProductos;
+        }
+
 
 
 
