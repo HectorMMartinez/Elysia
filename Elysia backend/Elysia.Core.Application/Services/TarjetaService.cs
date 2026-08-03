@@ -6,6 +6,7 @@ using Elysia.Core.Application.Interfaces;
 using Elysia.Core.Domain.Common;
 using Elysia.Core.Domain.Entities;
 using Elysia.Core.Domain.interfaces;
+using Microsoft.EntityFrameworkCore;
 using ReservaBook.Core.Domain.Interfaces;
 
 namespace Elysia.Core.Application.Services
@@ -13,13 +14,16 @@ namespace Elysia.Core.Application.Services
     public class TarjetaService : GenericService<Tarjeta, TarjetaResponseDto, EditTarjetaDto, SaveTarjetaDto>, ITarjetaService
     {
         private readonly ITarjetaRepository tarjetaRepository;
+        private readonly IAccountServices accountServices;
         private readonly IMapper mapper;
 
-        public TarjetaService(ITarjetaRepository genericRepository, IMapper _mapper) : base(genericRepository, _mapper)
+        public TarjetaService(ITarjetaRepository genericRepository, IAccountServices accountServices, IMapper _mapper) : base(genericRepository, _mapper)
         {
             this.tarjetaRepository = genericRepository;
+            this.accountServices = accountServices;
             this.mapper = _mapper;
         }
+
 
 
         public override async Task<TarjetaResponseDto?> AddAsync(SaveTarjetaDto? dto)
@@ -72,10 +76,10 @@ namespace Elysia.Core.Application.Services
                 }
 
 
-                 bool longitudValida =
-                (dto.Tipo == TipoTarjeta.Visa && dto.NumeroTarjeta.Trim().Length == 16)
-                 || (dto.Tipo == TipoTarjeta.Mastercard && dto.NumeroTarjeta.Trim().Length == 16)
-                 || (dto.Tipo == TipoTarjeta.AmericanExpress && dto.NumeroTarjeta.Trim().Length == 15);
+                bool longitudValida =
+               (dto.Tipo == TipoTarjeta.Visa && dto.NumeroTarjeta.Trim().Length == 16)
+                || (dto.Tipo == TipoTarjeta.Mastercard && dto.NumeroTarjeta.Trim().Length == 16)
+                || (dto.Tipo == TipoTarjeta.AmericanExpress && dto.NumeroTarjeta.Trim().Length == 15);
 
                 if (!longitudValida)
                 {
@@ -160,6 +164,18 @@ namespace Elysia.Core.Application.Services
                     return response;
                 }
 
+                var tarjetaExist = await tarjetaRepository.GetByIdAsync(id);
+
+                if (tarjetaExist == null)
+                {
+                    response.HasError = true;
+                    response.Errors.Add("No existe una tarjeta con el id especificado,favor verificar");
+                    return response;
+
+                }
+
+
+
                 if (dto.Tipo != TipoTarjeta.AmericanExpress || dto.Tipo != TipoTarjeta.Visa || dto.Tipo != TipoTarjeta.Mastercard)
                 {
                     response.HasError = true;
@@ -223,16 +239,6 @@ namespace Elysia.Core.Application.Services
                 int mesVencimiento = dto.MesVencimiento % 100;
                 int anioVencimiento = dto.AnioVencimiento % 100;
 
-                var tarjetaExist = await tarjetaRepository.GetByIdAsync(id);
-
-                if (tarjetaExist == null)
-                {
-                    response.HasError = true;
-                    response.Errors.Add("No existe una tarjeta con el id especificado,favor verificar");
-                    return response;
-
-                }
-
 
                 var datos = await tarjetaRepository.UpdateAsync(id, new Tarjeta()
                 {
@@ -244,6 +250,7 @@ namespace Elysia.Core.Application.Services
                     NumeroTarjeta = dto.NumeroTarjeta,
                     Tipo = dto.Tipo,
                     UsuarioId = dto.UsuarioId,
+                    Id = id
                 });
 
                 var map = mapper.Map<TarjetaResponseDto>(datos);
@@ -254,7 +261,7 @@ namespace Elysia.Core.Application.Services
             catch (Exception ex)
             {
 
-                throw new Exception("Ocurrio un error al intentar guardar la tarjeta" + ex.Message);
+                throw new Exception("Ocurrio un error al intentar editar la tarjeta" + ex.Message);
 
             }
 
@@ -264,21 +271,49 @@ namespace Elysia.Core.Application.Services
 
 
 
+        public async Task<List<MostrarTarjetasConRestauranteDto>> GetAllTarjetaConRestaurante()
+        {
+            var response = new MostrarTarjetasConRestauranteDto() { HasError = false, Errors = [] };
+
+            try
+            {
+
+                var data = await tarjetaRepository.GetlAllAsync();
+                var listData = new List<MostrarTarjetasConRestauranteDto>();
+                foreach (var item in data)
+                {
+                    var restaurante = await accountServices.GetUserById(item.UsuarioId);
+                    var tarjetas = new MostrarTarjetasConRestauranteDto()
+                    {
+                        Id = item.Id,
+                        UsuarioId = item.UsuarioId,
+                        AnioVencimiento = item.AnioVencimiento,
+                        DireccionRestaurante = restaurante.DireccionRestaurante,
+                        NombreRestaurante = restaurante.NombreRestaurante,
+                        CVV = item.CVV,
+                        FechaRegistro = item.FechaRegistro,
+                        MesVencimiento = item.MesVencimiento,
+                        Tipo = item.Tipo,
+                        NombreTitular = item.NombreTitular,
+                        NumeroTarjeta = item.NumeroTarjeta
+                    };
 
 
+                    listData.Add(tarjetas);
+
+                }
 
 
+                return listData;
+            }
+            catch (Exception ex)
+            {
 
+                throw new Exception("Ocurrio un error al intentar obtener los datos de las tarjetas" + ex.Message);
 
+            }
 
-
-
-
-
-
-
-
-
+        }
 
 
 

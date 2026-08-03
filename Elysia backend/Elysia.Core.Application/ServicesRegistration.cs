@@ -36,6 +36,9 @@ namespace Elysia.Core.Application
             services.AddScoped<IPlatoMenuService, PlatoMenuService>();
             services.AddScoped<IReservaServices, ReservaServices>();
             services.AddScoped<IPedidoService, PedidoService>();
+            services.AddScoped<IPuestoService,PuestoService>();
+            services.AddScoped<IEmpleadoService, EmpleadoService>();
+            services.AddScoped<IShiftService,ShiftService>();
             #endregion
 
 

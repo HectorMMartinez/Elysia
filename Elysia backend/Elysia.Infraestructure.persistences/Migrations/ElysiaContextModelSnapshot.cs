@@ -78,6 +78,84 @@ namespace Elysia.Infraestructure.persistences.Migrations
                     b.ToTable("DetallesPedidos", (string)null);
                 });
 
+            modelBuilder.Entity("Elysia.Core.Domain.Entities.Empleado", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<DateOnly>("HireDate")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
+
+                    b.Property<int>("PuestoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RestaurantId")
+                        .IsRequired()
+                        .HasMaxLength(2147483647)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Salary")
+                        .HasPrecision(24, 2)
+                        .HasColumnType("decimal(24,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PuestoId");
+
+                    b.ToTable("Empleados", (string)null);
+                });
+
+            modelBuilder.Entity("Elysia.Core.Domain.Entities.EmployeeShift", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EmpleadoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ShiftId")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("WorkDate")
+                        .HasColumnType("date");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmpleadoId");
+
+                    b.HasIndex("ShiftId");
+
+                    b.ToTable("EmployeeShifts", (string)null);
+                });
+
             modelBuilder.Entity("Elysia.Core.Domain.Entities.Membresia", b =>
                 {
                     b.Property<int>("Id")
@@ -436,6 +514,29 @@ namespace Elysia.Infraestructure.persistences.Migrations
                     b.ToTable("Productos", (string)null);
                 });
 
+            modelBuilder.Entity("Elysia.Core.Domain.Entities.Puesto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Puestos", (string)null);
+                });
+
             modelBuilder.Entity("Elysia.Core.Domain.Entities.Reserva", b =>
                 {
                     b.Property<int>("Id")
@@ -484,6 +585,34 @@ namespace Elysia.Infraestructure.persistences.Migrations
                     b.HasIndex("MesaId");
 
                     b.ToTable("Reservas", (string)null);
+                });
+
+            modelBuilder.Entity("Elysia.Core.Domain.Entities.Shift", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("PropietarioId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Shifts", (string)null);
                 });
 
             modelBuilder.Entity("Elysia.Core.Domain.Entities.Tarjeta", b =>
@@ -547,6 +676,36 @@ namespace Elysia.Infraestructure.persistences.Migrations
                     b.Navigation("Pedido");
 
                     b.Navigation("Plato");
+                });
+
+            modelBuilder.Entity("Elysia.Core.Domain.Entities.Empleado", b =>
+                {
+                    b.HasOne("Elysia.Core.Domain.Entities.Puesto", "Puesto")
+                        .WithMany("Empleados")
+                        .HasForeignKey("PuestoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Puesto");
+                });
+
+            modelBuilder.Entity("Elysia.Core.Domain.Entities.EmployeeShift", b =>
+                {
+                    b.HasOne("Elysia.Core.Domain.Entities.Empleado", "Empleado")
+                        .WithMany("EmployeeShifts")
+                        .HasForeignKey("EmpleadoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Elysia.Core.Domain.Entities.Shift", "Shift")
+                        .WithMany("EmployeeShifts")
+                        .HasForeignKey("ShiftId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Empleado");
+
+                    b.Navigation("Shift");
                 });
 
             modelBuilder.Entity("Elysia.Core.Domain.Entities.Membresia", b =>
@@ -647,6 +806,11 @@ namespace Elysia.Infraestructure.persistences.Migrations
                     b.Navigation("Platos");
                 });
 
+            modelBuilder.Entity("Elysia.Core.Domain.Entities.Empleado", b =>
+                {
+                    b.Navigation("EmployeeShifts");
+                });
+
             modelBuilder.Entity("Elysia.Core.Domain.Entities.Menu", b =>
                 {
                     b.Navigation("PlatoMenus");
@@ -683,6 +847,16 @@ namespace Elysia.Infraestructure.persistences.Migrations
                     b.Navigation("Movimientos");
 
                     b.Navigation("PlatoProductos");
+                });
+
+            modelBuilder.Entity("Elysia.Core.Domain.Entities.Puesto", b =>
+                {
+                    b.Navigation("Empleados");
+                });
+
+            modelBuilder.Entity("Elysia.Core.Domain.Entities.Shift", b =>
+                {
+                    b.Navigation("EmployeeShifts");
                 });
 #pragma warning restore 612, 618
         }

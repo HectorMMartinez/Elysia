@@ -17,5 +17,7 @@ namespace Elysia.Core.Application.Interfaces
         Task<UserResponseDto> InhativarUser(string usuarioId);
         Task<RegisterResponseDto?> RegisterUser(SaveUserRequestDto? saveUser);
         Task<UserResponseDto?> RessetPassowrd(RessetPasswordRequestDto? request);
+        Task<List<UserDto>> GetAllUserPropietario(bool? IsActive = true);
+        Task<List<UserDto>> GetAllUserAdmin(bool? IsActive = true);
     }
 }

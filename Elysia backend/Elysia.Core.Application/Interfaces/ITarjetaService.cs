@@ -10,6 +10,7 @@ namespace Elysia.Core.Application.Interfaces
 {
     public interface ITarjetaService : IGenericService<Tarjeta,TarjetaResponseDto,EditTarjetaDto,SaveTarjetaDto>
     {
+        Task<List<MostrarTarjetasConRestauranteDto>> GetAllTarjetaConRestaurante();
 
     }
 }

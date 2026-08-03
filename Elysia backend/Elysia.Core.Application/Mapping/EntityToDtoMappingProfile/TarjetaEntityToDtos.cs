@@ -23,6 +23,8 @@ namespace Elysia.Core.Application.Mapping.EntityToDtoMappingProfile
 
             CreateMap<Tarjeta, TarjetaResponseDto>()
                 .ReverseMap();
+
+            CreateMap<EditarTarjetaRequestDto,EditTarjetaDto>().ReverseMap();   
            
         
         

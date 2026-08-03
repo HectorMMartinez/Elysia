@@ -22,7 +22,8 @@ namespace Elysia.Core.Application.Mapping.EntityToDtoMappingProfile
 
             CreateMap<Membresia,EditMembresiaDto>() 
                 .ReverseMap();
-        
+
+            CreateMap<Membresia, MostrarMembresiaConPropietarioDto>().ReverseMap();
         
         }
 

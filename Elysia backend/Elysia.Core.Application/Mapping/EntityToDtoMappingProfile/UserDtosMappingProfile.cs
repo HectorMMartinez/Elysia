@@ -16,8 +16,9 @@ namespace Elysia.Core.Application.Mapping.EntityToDtoMappingProfile
                 .ReverseMap()
                 .ForMember(x => x.LogoRestaurante, opt => opt.Ignore())
                 .ForMember(x => x.ProfileImage,  opt => opt.Ignore());
-                        
-                
+
+            CreateMap<SaveUserRequestDto, EditPerfilUserDto>().ReverseMap();
+            CreateMap<SaveUserRequestDto, EditarDatosRestaurante>().ReverseMap();
          
         
         

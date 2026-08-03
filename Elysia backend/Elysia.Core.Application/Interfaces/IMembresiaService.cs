@@ -12,7 +12,9 @@ namespace Elysia.Core.Application.Interfaces
     public interface IMembresiaService : IGenericService<Membresia,MembresiaResponseDto,EditMembresiaDto,SaveMembresiaDto>
     {
 
-        Task<bool> CambiarEstadoAsync(int id,MembresiaEstado estado);   
+        Task<bool> CambiarEstadoAsync(int id,MembresiaEstado estado);
+        Task<Membresia?> GetMembresiaByPropietarioId(string id);
+        Task<List<MostrarMembresiaConPropietarioDto>?> GetAllMembresiaConPropietario();
 
     }
 }
