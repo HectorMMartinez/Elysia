@@ -9,6 +9,7 @@ namespace Elysia.Core.Domain.interfaces
     {
 
         Task<bool> CambiarEstado(int id, MembresiaEstado estado);
+        Task<Membresia?> GetMembresiaByPropietarioId(string id);
 
 
     }

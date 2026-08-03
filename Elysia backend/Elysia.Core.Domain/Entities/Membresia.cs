@@ -10,7 +10,7 @@ namespace Elysia.Core.Domain.Entities
 
         public int Id { get; set; }
         public required string UsuarioId { get; set; }
-        public Plan? Plan { get; set; }
+        public Plan? Plan { get; set; } = null;
         public required int PlanId { get; set; }
         public required DateTime FechaInicio { get; set; }
         public required DateTime FechaFin {  get; set; }

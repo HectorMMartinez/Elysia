@@ -4,6 +4,7 @@ using Elysia.Core.Domain.Common;
 using Elysia.Core.Domain.Entities;
 using Elysia.Core.Domain.interfaces;
 using Elysia.Infraestructure.persistences.Contexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Elysia.Infraestructure.persistences.Repositories
 {
@@ -32,6 +33,22 @@ namespace Elysia.Infraestructure.persistences.Repositories
 
             return false;
            
+        }
+
+        public async Task<Membresia?> GetMembresiaByPropietarioId(string id)
+        {
+            var membresia = await AppContext.Set<Membresia>().Where(x => x.UsuarioId == id && x.Estado == MembresiaEstado.Activa).FirstOrDefaultAsync();
+
+            if (membresia== null)
+            {
+                return null!;
+
+            }
+
+            return membresia;
+
+
+
         }
     }
 }

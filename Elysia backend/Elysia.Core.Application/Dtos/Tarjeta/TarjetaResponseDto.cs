@@ -11,17 +11,17 @@ namespace Elysia.Core.Application.Dtos.Tarjeta
     {
 
         public  int  Id { get; set; }
-        public  string UsuarioId { get; set; }
-        public  string NombreTitular { get; set; }
-        public  string NumeroTarjeta { get; set; }
-        public  string CVV { get; set; }
+        public  string UsuarioId { get; set; } = string.Empty;
+        public string NombreTitular { get; set; } = string.Empty;
+        public string NumeroTarjeta { get; set; } = string.Empty;
+        public string CVV { get; set; } = string.Empty;
         public  int MesVencimiento { get; set; }
         public  int AnioVencimiento { get; set; }
         public  TipoTarjeta Tipo { get; set; }
         public  DateTime FechaRegistro { get; set; }
         public bool HasError { get; set; }
         public List<string> Errors { get; set; } = new List<string>();
-        public string Message { get; set; }
+        public string Message { get; set; } = string.Empty;
         
 
 

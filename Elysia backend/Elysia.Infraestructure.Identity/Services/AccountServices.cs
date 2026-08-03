@@ -3,6 +3,7 @@
 using Elysia.Core.Application.Dtos.Email;
 using Elysia.Core.Application.Dtos.User;
 using Elysia.Core.Application.Interfaces;
+using Elysia.Core.Domain.Common;
 using Elysia.Core.Domain.Settings;
 using Elysia.Infraestructure.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography.Xml;
 using System.Text;
 
 namespace Elysia.Infraestructure.Identity.Services
@@ -663,6 +665,7 @@ namespace Elysia.Infraestructure.Identity.Services
 
 
             var ListUser = await users.ToListAsync();
+            
 
             foreach (var item in ListUser)
             {
@@ -701,6 +704,142 @@ namespace Elysia.Infraestructure.Identity.Services
 
 
         }
+
+
+        public async Task<List<UserDto>> GetAllUserPropietario(bool? IsActive = true)
+        {
+
+            var users = userManager.Users;
+
+
+            if (users == null)
+            {
+                return new List<UserDto>();
+            }
+
+
+            List<UserDto> ListUserDto = [];
+            if (IsActive!.Value && IsActive != null)
+            {
+                users = users.Where(u => u.EmailConfirmed);
+
+            }
+            else
+            {
+                users = users.Where(u => !u.EmailConfirmed);
+            }
+
+
+            var ListUser = await users.ToListAsync();
+
+
+            foreach (var item in ListUser)
+            {
+
+                var rolesList = await userManager.GetRolesAsync(item);
+
+
+                ListUserDto.Add(new UserDto()
+                {
+
+                    Id = item.Id,
+                    Name = item.Name,
+                    UserName = item.UserName ?? "",
+                    LastName = item.LastName,
+                    Email = item.Email ?? "",
+                    IsActive = item.EmailConfirmed,
+                    NombreRestaurante = item.NombreRestaurante,
+                    RNC = item.RNC,
+                    LogoRestaurante = item.LogoRestaurante,
+                    DireccionRestaurante = item.DireccionRestaurante,
+                    HoraApertura = item.HoraApertura.Value,
+                    HoraCierre = item.HoraCierre.Value,
+                    PhoneRestaurante = item.PhoneRestaurante,
+                    IdCard = item.IdCard,
+                    Phone = item.PhoneNumber ?? "",
+                    ProfileImage = item.ProfileImage,
+                    Role = rolesList.FirstOrDefault() ?? ""
+
+                });
+
+
+
+            }
+
+            return ListUserDto.Where(c => c.Role == UserRoles.Propietario.ToString()).ToList();
+
+
+        }
+
+
+
+
+        public async Task<List<UserDto>> GetAllUserAdmin(bool? IsActive = true)
+        {
+
+            var users = userManager.Users;
+
+
+            if (users == null)
+            {
+                return new List<UserDto>();
+            }
+
+
+            List<UserDto> ListUserDto = [];
+            if (IsActive!.Value && IsActive != null)
+            {
+                users = users.Where(u => u.EmailConfirmed);
+
+            }
+            else
+            {
+                users = users.Where(u => !u.EmailConfirmed);
+            }
+
+
+            var ListUser = await users.ToListAsync();
+
+
+            foreach (var item in ListUser)
+            {
+
+                var rolesList = await userManager.GetRolesAsync(item);
+
+
+                ListUserDto.Add(new UserDto()
+                {
+
+                    Id = item.Id,
+                    Name = item.Name,
+                    UserName = item.UserName ?? "",
+                    LastName = item.LastName,
+                    Email = item.Email ?? "",
+                    IsActive = item.EmailConfirmed,
+                    NombreRestaurante = item.NombreRestaurante,
+                    RNC = item.RNC,
+                    LogoRestaurante = item.LogoRestaurante,
+                    DireccionRestaurante = item.DireccionRestaurante,
+                    HoraApertura = item.HoraApertura.Value,
+                    HoraCierre = item.HoraCierre.Value,
+                    PhoneRestaurante = item.PhoneRestaurante,
+                    IdCard = item.IdCard,
+                    Phone = item.PhoneNumber ?? "",
+                    ProfileImage = item.ProfileImage,
+                    Role = rolesList.FirstOrDefault() ?? ""
+
+                });
+
+
+
+            }
+
+            return ListUserDto.Where(c => c.Role == UserRoles.Admin.ToString()).ToList();
+
+
+        }
+
+
 
 
 

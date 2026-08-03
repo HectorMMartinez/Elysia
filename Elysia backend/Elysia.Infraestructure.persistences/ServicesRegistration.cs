@@ -63,6 +63,9 @@ namespace Elysia.Infraestructure.persistences
             Service.AddScoped<IReservasRepository, ReservasRepository>();
             Service.AddScoped<IPedidoRepository, PedidoRepository>();
             Service.AddScoped<IDetallesPedidoRepository, DetallesPedidoRepository>();
+            Service.AddScoped<IPuestoRepository, PuestoRepository>();
+            Service.AddScoped<IEmpleadoRepository, EmpleadoRepository>();
+            Service.AddScoped<IShiftRepository, ShiftRepository>();
             #endregion
 
         }

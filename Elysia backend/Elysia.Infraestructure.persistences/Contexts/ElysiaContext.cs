@@ -25,6 +25,10 @@ namespace Elysia.Infraestructure.persistences.Contexts
         public DbSet<DetallesPedido> DetallesPedidos { get; set; }
         public DbSet<CategoriaPlato> CategoriaPlatos { get; set; }
         public DbSet<Producto> Productos { get; set; }
+        public DbSet<Empleado> Empleados { get; set; }
+        public DbSet<Puesto> Puestos { get; set; }
+        public DbSet<Shift> Shifts { get; set; }
+        public DbSet<EmployeeShift> EmployeeShifts { get; set; }
 
 
 
