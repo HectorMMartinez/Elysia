@@ -54,202 +54,188 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         }
 
 
-        [HttpGet("get-all-pededidos-pendientes")]
+        
+
+        [HttpPut("cambiar-pedido-en-Preparacion/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllPedidosPentiendes()
+        public async Task<IActionResult> PedidoEnPreparacion(int id)
         {
             try
             {
-                var user_id = User.FindFirst("UId")!.Value;
-                var data = await pedidoService.GetAllPedidosPendienteAsync(user_id);
 
-                if (data == null || data.Count == 0)
+                if(id <= 0)
                 {
-                    return NotFound("No se encontraron pedido pendiente registrado por este propietario");
-
+                    return BadRequest("Debes ingresar correctamente el id, para cambiar el estado del pedido");
                 }
 
-                return Ok(data);
+
+                var pedido_exist = await pedidoService.GetByIdAsync(id);
+                if (pedido_exist == null)
+                {
+                    return NotFound("No se encontro un pedido con ese id, favor verificar");
+
+                }
+               
+                var data = await pedidoService.CambiarEstadoAsync(id,EstadoPedido.EnPreparacion);
+                if (!data)
+                {
+                    return BadRequest("Ocurrio un error al intentar colocar el pedido en preparacion");
+                }
+
+                var pedido = await pedidoService.GetByIdAsync(id);
+                var map = mapper.Map<EditarPedidoDto>(pedido);
+                var updatePedido = await pedidoService.UpdateAsync(pedido.Id,map);
+
+                return Ok("Pedido colocado en preparacion correctamente");
 
             }
             catch (Exception ex)
             {
 
-
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-
-
             }
         }
 
-
-
-        [HttpGet("get-all-pededidos-cancelados")]
+        [HttpPut("cambiar-pedido-listo/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllPedidosCancelados()
+        public async Task<IActionResult> PedidoListo(int id)
         {
             try
             {
-                var user_id = User.FindFirst("UId")!.Value;
-                var data = await pedidoService.GetAllPedidosCanceladosAsync(user_id);
 
-                if (data == null || data.Count == 0)
+                if (id <= 0)
                 {
-                    return NotFound("No se encontraron pedido cancelados registrado por este propietario");
+                    return BadRequest("Debes ingresar correctamente el id, para cambiar el estado del pedido");
+                }
+
+
+                var pedido_exist = await pedidoService.GetByIdAsync(id);
+                if (pedido_exist == null)
+                {
+                    return NotFound("No se encontro un pedido con ese id, favor verificar");
 
                 }
 
-                return Ok(data);
+                var data = await pedidoService.CambiarEstadoAsync(id, EstadoPedido.Listo);
+                if (!data)
+                {
+                    return BadRequest("Ocurrio un error al intentar colocar el pedido como Listo");
+                }
+
+                var pedido = await pedidoService.GetByIdAsync(id);
+                var map = mapper.Map<EditarPedidoDto>(pedido);
+                var updatePedido = await pedidoService.UpdateAsync(pedido.Id, map);
+
+                return Ok("Pedido cambiado a listo correctamente");
 
             }
             catch (Exception ex)
             {
 
-
-
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-
-
             }
         }
 
 
 
-        [HttpGet("get-all-pededidos-en-proceso")]
+        [HttpPut("cancelar-pedido/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllPedidosEnProceso()
+        public async Task<IActionResult> CancelarPedido(int id)
         {
             try
             {
-                var user_id = User.FindFirst("UId")!.Value;
-                var data = await pedidoService.GetAllPedidosEnProcesoAsync(user_id);
 
-                if (data == null || data.Count == 0)
+                if (id <= 0)
                 {
-                    return NotFound("No se encontraron pedido en proceso registrado por este propietario");
+                    return BadRequest("Debes ingresar correctamente el id, para cambiar el estado del pedido");
+                }
+
+
+                var pedido_exist = await pedidoService.GetByIdAsync(id);
+                if (pedido_exist == null)
+                {
+                    return NotFound("No se encontro un pedido con ese id, favor verificar");
 
                 }
 
-                return Ok(data);
+                var data = await pedidoService.CambiarEstadoAsync(id, EstadoPedido.Cancelado);
+                if (!data)
+                {
+                    return BadRequest("Ocurrio un error al intentar colocar el pedido como Cancelado");
+                }
+
+
+                var pedido = await pedidoService.GetByIdAsync(id);
+                var map = mapper.Map<EditarPedidoDto>(pedido);
+                var updatePedido = await pedidoService.UpdateAsync(pedido.Id, map);
+
+                return Ok("Pedido cancelado correctamente");
 
             }
             catch (Exception ex)
             {
 
-
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-
-
             }
         }
 
 
 
 
-        [HttpGet("get-all-pededidos-listo")]
+        [HttpPut("finalizar-pedido/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllPedidosListo()
+        public async Task<IActionResult> FinalizarPedido(int id)
         {
             try
             {
-                var user_id = User.FindFirst("UId")!.Value;
-                var data = await pedidoService.GetAllPedidosListoAsync(user_id);
 
-                if (data == null || data.Count == 0)
+                if (id <= 0)
                 {
-                    return NotFound("No se encontraron pedido (listo) registrado por este propietario");
+                    return BadRequest("Debes ingresar correctamente el id, para cambiar el estado del pedido");
+                }
+
+
+                var pedido_exist = await pedidoService.GetByIdAsync(id);
+                if (pedido_exist == null)
+                {
+                    return NotFound("No se encontro un pedido con ese id, favor verificar");
 
                 }
 
-                return Ok(data);
+                var data = await pedidoService.CambiarEstadoAsync(id, EstadoPedido.Finalizado);
+                if (!data)
+                {
+                    return BadRequest("Ocurrio un error al intentar colocar el pedido como Finalizado");
+                }
+
+
+                var pedido = await pedidoService.GetByIdAsync(id);
+                var map = mapper.Map<EditarPedidoDto>(pedido);
+                var updatePedido = await pedidoService.UpdateAsync(pedido.Id, map);
+
+                return Ok("Pedido Finalizado correctamente");
 
             }
             catch (Exception ex)
             {
 
-
-
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-
-
             }
         }
 
 
-
-
-
-        [HttpGet("get-all-pededidos-en-entregado")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllPedidosEntregado()
-        {
-            try
-            {
-                var user_id = User.FindFirst("UId")!.Value;
-                var data = await pedidoService.GetAllPedidosEntregadoAsync(user_id);
-
-                if (data == null || data.Count == 0)
-                {
-                    return NotFound("No se encontraron pedido (entregado) registrado por este propietario");
-
-                }
-
-                return Ok(data);
-
-            }
-            catch (Exception ex)
-            {
-
-
-
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-
-
-            }
-        }
-
-
-
-        [HttpGet("get-all-pededidos-en-finalizado")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllPedidosFinalizado()
-        {
-            try
-            {
-                var user_id = User.FindFirst("UId")!.Value;
-                var data = await pedidoService.GetAllPedidosFinalizado(user_id);
-
-                if (data == null || data.Count == 0)
-                {
-                    return NotFound("No se encontraron pedido (Finalizado) registrado por este propietario");
-
-                }
-
-                return Ok(data);
-
-            }
-            catch (Exception ex)
-            {
-
-
-
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-
-
-            }
-        }
 
 
 

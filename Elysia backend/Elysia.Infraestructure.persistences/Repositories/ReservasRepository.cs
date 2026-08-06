@@ -40,6 +40,7 @@ namespace Elysia.Infraestructure.persistences.Repositories
         }
 
 
+      
         public async Task<List<Reserva?>> GetReservasCanceladaByPropietario(string propietario)
         {
 
@@ -118,9 +119,35 @@ namespace Elysia.Infraestructure.persistences.Repositories
            
         }
 
+        public async Task<bool> CambiarEstadoAsync(int id, EstadoReserva estado)
+        {
+            var reserva = await context.Set<Reserva>().FindAsync(id);
+
+            if (reserva != null)
+            {
+                reserva.Estado = estado;
+                await context.SaveChangesAsync();
+                return true;
+            }
 
 
+            return false;
+        }
 
+        public async Task<List<Reserva?>> GetReservasEnProcesoByPropietario(string propietario)
+        {
+            var reservas = await context.Set<Reserva>().Where(x => x.IdPropietario == propietario && x.Estado == EstadoReserva.EnProceso).ToListAsync();
+
+
+            if (reservas.Any())
+            {
+                return reservas;
+
+            }
+
+
+            return [];
+        }
     }
 
 }

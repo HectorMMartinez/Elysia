@@ -76,11 +76,10 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
                     return NotFound("No se encontraron membresias registradas con ese id, favor verificar");
                 }
 
-                data.Estado = MembresiaEstado.Cancelada;
-                var map = mapper.Map<EditMembresiaDto>(data);
-                var result = await service.UpdateAsync(data.Id,map);
+              
+                var result = await service.CambiarEstadoAsync(data.Id,MembresiaEstado.Cancelada);
 
-                if(result == null)
+                if(!result)
                 {
                     return NotFound("Ocurrio un error al intentar cancelar la membresia");
                 }
@@ -118,11 +117,10 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
                     return NotFound("No se encontraron membresias registradas con ese id, favor verificar");
                 }
 
-                data.Estado = MembresiaEstado.Suspendida;
-                var map = mapper.Map<EditMembresiaDto>(data);
-                var result = await service.UpdateAsync(data.Id, map);
+               
+                var result = await service.CambiarEstadoAsync(data.Id, MembresiaEstado.Suspendida);
 
-                if (result == null)
+                if (!result)
                 {
                     return NotFound("Ocurrio un error al intentar suspender la membresia");
                 }
@@ -161,7 +159,8 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
 
                 data.Estado = MembresiaEstado.Activa;
                 var map = mapper.Map<EditMembresiaDto>(data);
-                map.FechaFin = DateTime.Now.AddMonths(1);   
+                map.Id = id;
+                map.FechaFin = DateTime.Now.AddMonths(1); 
                 var result = await service.UpdateAsync(data.Id, map);
 
                 if (result == null)

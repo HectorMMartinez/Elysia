@@ -8,6 +8,7 @@ using Elysia.Core.Domain.Entities;
 using Elysia.Core.Domain.interfaces;
 using Microsoft.EntityFrameworkCore;
 using ReservaBook.Core.Domain.Interfaces;
+using System.Xml;
 
 namespace Elysia.Core.Application.Services
 {
@@ -38,6 +39,36 @@ namespace Elysia.Core.Application.Services
                     response.Errors.Add("Ocurrio un error al intentar guardar la tarjeta, no se enviaron los datos correctamente");
                     return response;
                 }
+
+
+                var data = await tarjetaRepository.GetlAllAsync();
+                if(data.Any() && data.Any(x => x.CVV == dto.CVV))
+                {
+                    response.HasError = true;
+                    response.Errors.Add("CVV invalido, favor verificar y volver al intentar");
+                    return response;
+
+                }
+
+                if (data.Any() && data.Any(x => x.NombreTitular == dto.NombreTitular && x.Tipo == dto.Tipo))
+                {
+                    response.HasError = true;
+                    response.Errors.Add($"El titular indicado ya tiene una tarjeta {dto.Tipo.ToString()} registrada");
+                    return response;
+                    
+                }
+
+
+                if (data.Any() && data.Any(x => x.NumeroTarjeta == dto.NumeroTarjeta))
+                {
+                    response.HasError = true;
+                    response.Errors.Add($"El numero de tarjeta es invalido favor verificar y volver a intentar");
+                    return response;
+
+                }
+
+
+             
 
                 if (!Enum.IsDefined(typeof(TipoTarjeta), dto.Tipo))
                 {
@@ -164,6 +195,8 @@ namespace Elysia.Core.Application.Services
                     return response;
                 }
 
+
+
                 var tarjetaExist = await tarjetaRepository.GetByIdAsync(id);
 
                 if (tarjetaExist == null)
@@ -175,8 +208,48 @@ namespace Elysia.Core.Application.Services
                 }
 
 
+                var data = await tarjetaRepository.GetlAllAsync();
+                if (data.Any() && data.Any(x => x.CVV == dto.CVV))
+                {
+                    response.HasError = true;
+                    response.Errors.Add("CVV invalido, favor verificar y volver al intentar");
+                    return response;
 
-                if (dto.Tipo != TipoTarjeta.AmericanExpress || dto.Tipo != TipoTarjeta.Visa || dto.Tipo != TipoTarjeta.Mastercard)
+                }
+
+
+                if (data.Any() && data.Any(x => x.NombreTitular == dto.NombreTitular && x.Tipo == dto.Tipo && x.Id != id))
+                {
+                    response.HasError = true;
+                    response.Errors.Add($"El titular indicado ya tiene una tarjeta {dto.Tipo.ToString()} registrada");
+                    return response;
+
+                }
+
+
+                if (data.Any() && data.Any(x => x.NumeroTarjeta == dto.NumeroTarjeta))
+                {
+                    response.HasError = true;
+                    response.Errors.Add($"El numero de tarjeta es invalido favor verificar y volver a intentar");
+                    return response;
+
+                }
+
+
+                bool longitudValida =
+               (dto.Tipo.ToString() == TipoTarjeta.Visa.ToString() && dto.NumeroTarjeta.Trim().Length == 16)
+               || (dto.Tipo.ToString() == TipoTarjeta.Mastercard.ToString() && dto.NumeroTarjeta.Trim().Length == 16)
+               || (dto.Tipo.ToString() == TipoTarjeta.AmericanExpress.ToString() && dto.NumeroTarjeta.Trim().Length == 15);
+
+                if (!longitudValida)
+                {
+                    response.HasError = true;
+                    response.Errors.Add("La longitud del número de tarjeta no corresponde con el tipo seleccionado.");
+                    return response;
+                }
+
+
+                if (!Enum.IsDefined(typeof(TipoTarjeta), dto.Tipo))
                 {
                     response.HasError = true;
                     response.Errors.Add("El tipo de tarjeta no es valido, favor verificar");
@@ -186,7 +259,7 @@ namespace Elysia.Core.Application.Services
 
 
 
-                if (dto.Tipo == TipoTarjeta.AmericanExpress)
+                if (dto.Tipo.ToString() == TipoTarjeta.AmericanExpress.ToString())
                 {
                     if (dto.CVV.Length != 4)
                     {
@@ -197,7 +270,7 @@ namespace Elysia.Core.Application.Services
 
                 }
 
-                if (dto.Tipo == TipoTarjeta.Visa || dto.Tipo == TipoTarjeta.Mastercard)
+                if (dto.Tipo.ToString() == TipoTarjeta.Visa .ToString()|| dto.Tipo.ToString() == TipoTarjeta.Mastercard.ToString())
                 {
                     if (dto.CVV.Length != 3)
                     {
@@ -249,7 +322,7 @@ namespace Elysia.Core.Application.Services
                     NombreTitular = dto.NombreTitular,
                     NumeroTarjeta = dto.NumeroTarjeta,
                     Tipo = dto.Tipo,
-                    UsuarioId = dto.UsuarioId,
+                    UsuarioId = tarjetaExist.UsuarioId,
                     Id = id
                 });
 

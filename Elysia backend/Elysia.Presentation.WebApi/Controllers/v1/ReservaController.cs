@@ -1,7 +1,9 @@
 ﻿using Asp.Versioning;
 using AutoMapper;
+using Elysia.Core.Application.Dtos.pedido;
 using Elysia.Core.Application.Dtos.reservas;
 using Elysia.Core.Application.Interfaces;
+using Elysia.Core.Application.Services;
 using Elysia.Core.Domain.Common;
 using Elysia.Infraestructure.Identity.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -58,127 +60,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         }
 
 
-        [HttpGet("get-all-reservas-activas")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ReservaResponseDto))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllReservasActivas()
-        {
-            try
-            {
-                var user_id = User.FindFirst("UId")!.Value;
-
-                var data = await reservaServices.GetReservasActivasByPropietario(user_id);
-                if (data == null || data.Count == 0)
-                {
-                    return NotFound("No se encontraron reservas  registradas en estado (activas)");
-                }
-
-                return Ok(data);
-
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception("Ocurrio un error al intentar obtener las reservas (activas) del propietario");
-
-
-            }
-        }
-
-
-
-        [HttpGet("get-all-reservas-finalizadas")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ReservaResponseDto))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllReservasFinalizadas()
-        {
-            try
-            {
-                var user_id = User.FindFirst("UId")!.Value;
-
-                var data = await reservaServices.GetReservasFinalizadasByPropietario(user_id);
-                if (data == null || data.Count == 0)
-                {
-                    return NotFound("No se encontraron reservas  registradas en estado (finalizas)");
-                }
-
-                return Ok(data);
-
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception("Ocurrio un error al intentar obtener las reservas (finalizas) del propietario");
-
-
-            }
-        }
-
-
-        [HttpGet("get-all-reservas-canceladas")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ReservaResponseDto))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllReservasCanceladas()
-        {
-            try
-            {
-                var user_id = User.FindFirst("UId")!.Value;
-
-                var data = await reservaServices.GetReservasCanceladaByPropietario(user_id);
-                if (data == null || data.Count == 0)
-                {
-                    return NotFound("No se encontraron reservas  registradas en estado (canceladas)");
-                }
-
-                return Ok(data);
-
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception("Ocurrio un error al intentar obtener las reservas (canceladas) del propietario");
-
-
-            }
-        }
-
-
-
-
-        [HttpGet("get-all-reservas-no-asistio")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ReservaResponseDto))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllReservasNoAsistio()
-        {
-            try
-            {
-                var user_id = User.FindFirst("UId")!.Value;
-
-                var data = await reservaServices.GetReservasNoAsistioByPropietario(user_id);
-                if (data == null || data.Count == 0)
-                {
-                    return NotFound("No se encontraron reservas  registradas en estado (NoAsistio)");
-                }
-
-                return Ok(data);
-
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception("Ocurrio un error al intentar obtener las reservas (NoAsistio) del propietario");
-
-
-            }
-        }
-
-
-
-
+        
         [HttpPost("add-reserva")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ReservaResponseDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -206,6 +88,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
                 map.FechaActualizacion = DateTime.Now;
                 map.FechaCreacion = map.FechaActualizacion;   
                 map.IdPropietario = user_id;
+                map.Estado = EstadoReserva.Activa;
                 var data = await reservaServices.AddAsync(map); 
                 return Ok(data);
 
@@ -328,6 +211,187 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
 
             }
         }
+
+
+        [HttpPut("cambiar-reserva-en-Proceso/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> ReservaEnProceso(int id)
+        {
+            try
+            {
+
+                if (id <= 0)
+                {
+                    return BadRequest("Debes ingresar correctamente el id, para cambiar el estado de la reserva");
+                }
+
+
+                var reserva_Exist = await reservaServices.GetByIdAsync(id);
+                if (reserva_Exist == null)
+                {
+                    return NotFound("No se encontro una reserva con ese id, favor verificar");
+
+                }
+
+                var data = await reservaServices.CambiarEstadoAsync(id, EstadoReserva.EnProceso);
+                if (!data)
+                {
+                    return BadRequest("Ocurrio un error al intentar colocar la reserva a en proceso");
+                }
+
+                var reserva = await reservaServices.GetByIdAsync(id);
+                var map = _mapper.Map<EditarReservaDto>(reserva);
+                var updatePedido = await reservaServices.UpdateAsync(reserva.Id, map);
+
+                return Ok("Reserva colocada en proceso correctamente");
+
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+
+
+        [HttpPut("cambiar-reserva-no-asistio/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> ReservaNoAsistio(int id)
+        {
+            try
+            {
+
+                if (id <= 0)
+                {
+                    return BadRequest("Debes ingresar correctamente el id, para cambiar el estado de la reserva");
+                }
+
+
+                var reserva_Exist = await reservaServices.GetByIdAsync(id);
+                if (reserva_Exist == null)
+                {
+                    return NotFound("No se encontro una reserva con ese id, favor verificar");
+
+                }
+
+                var data = await reservaServices.CambiarEstadoAsync(id, EstadoReserva.NoAsistio);
+                if (!data)
+                {
+                    return BadRequest("Ocurrio un error al intentar colocar la reserva a en NoAsistio ");
+                }
+
+                var reserva = await reservaServices.GetByIdAsync(id);
+                var map = _mapper.Map<EditarReservaDto>(reserva);
+                var updatePedido = await reservaServices.UpdateAsync(reserva.Id, map);
+
+                return Ok("Reserva colocada en (No Asistio) correctamente");
+
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+
+        [HttpPut("finalizar-reserva/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> FinalizarReserva(int id)
+        {
+            try
+            {
+
+                if (id <= 0)
+                {
+                    return BadRequest("Debes ingresar correctamente el id, para cambiar el estado de la reserva");
+                }
+
+
+                var reserva_Exist = await reservaServices.GetByIdAsync(id);
+                if (reserva_Exist == null)
+                {
+                    return NotFound("No se encontro una reserva con ese id, favor verificar");
+
+                }
+
+                var data = await reservaServices.CambiarEstadoAsync(id, EstadoReserva.Finalizada);
+                if (!data)
+                {
+                    return BadRequest("Ocurrio un error al intentar colocar la reserva como finalizada ");
+                }
+
+                var reserva = await reservaServices.GetByIdAsync(id);
+                var map = _mapper.Map<EditarReservaDto>(reserva);
+                var updatePedido = await reservaServices.UpdateAsync(reserva.Id, map);
+
+                return Ok("Reserva finalizada correctamente");
+
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+
+
+        [HttpPut("cancelar-reserva/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> CancelarReserva(int id)
+        {
+            try
+            {
+
+                if (id <= 0)
+                {
+                    return BadRequest("Debes ingresar correctamente el id, para cambiar el estado de la reserva");
+                }
+
+
+                var reserva_Exist = await reservaServices.GetByIdAsync(id);
+                if (reserva_Exist == null)
+                {
+                    return NotFound("No se encontro una reserva con ese id, favor verificar");
+
+                }
+
+                var data = await reservaServices.CambiarEstadoAsync(id, EstadoReserva.Cancelada);
+                if (!data)
+                {
+                    return BadRequest("Ocurrio un error al intentar colocar la reserva como cancelada ");
+                }
+
+                var reserva = await reservaServices.GetByIdAsync(id);
+                var map = _mapper.Map<EditarReservaDto>(reserva);
+                var updatePedido = await reservaServices.UpdateAsync(reserva.Id, map);
+
+                return Ok("Reserva Cancelada correctamente");
+
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+
+
 
     }
 }

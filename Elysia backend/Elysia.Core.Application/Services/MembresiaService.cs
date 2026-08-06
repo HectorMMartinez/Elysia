@@ -23,7 +23,7 @@ namespace Elysia.Core.Application.Services
             this.repo = genericRepository;
             this.planRepository = planRepository;
             this.accountServices = accountServices;
-            this.mapper = mapper;
+            this.mapper = _mapper;
         }
 
 
@@ -33,7 +33,7 @@ namespace Elysia.Core.Application.Services
             {
 
 
-                if (estado != MembresiaEstado.Suspendida || estado != MembresiaEstado.Cancelada || estado != MembresiaEstado.Vencida || estado != MembresiaEstado.Activa)
+                if (estado != MembresiaEstado.Suspendida && estado != MembresiaEstado.Cancelada && estado != MembresiaEstado.Vencida && estado != MembresiaEstado.Activa)
                 {
                     return false;
 
@@ -81,7 +81,8 @@ namespace Elysia.Core.Application.Services
             {
                 var data = await repo.GetlAllAsync();
                 var listMembresia = new List<MostrarMembresiaConPropietarioDto>();
-                if(data != null || data.Count >= 1)
+                var listMembresiaClean = new List<MostrarMembresiaConPropietarioDto>();
+                if (data != null || data.Count >= 1)
                 {
                     foreach(var item in data)
                     {
@@ -111,11 +112,31 @@ namespace Elysia.Core.Application.Services
                             item.Estado = MembresiaEstado.Suspendida;
                             var map = mapper.Map<Membresia>(item);
                             await repo.UpdateAsync(item.Id, map);
-                            listMembresia.Add(item);
-
-
+                            listMembresiaClean.Add(item);
+                       
                         }
 
+                    }
+
+
+                    foreach(var item in listMembresiaClean)
+                    {
+                        listMembresia.Remove(item); 
+                    }
+
+
+
+                    if(listMembresiaClean.Count >= 1 && listMembresia.Count >= 1)
+                    {
+                        listMembresiaClean.AddRange(listMembresia);
+                        return listMembresiaClean;
+                    }
+
+
+
+                    if (listMembresiaClean.Count >= 1 && listMembresia.Count <= 0)
+                    {
+                        return listMembresiaClean;
                     }
 
 
@@ -124,9 +145,8 @@ namespace Elysia.Core.Application.Services
                 }
 
 
+
                 return new List<MostrarMembresiaConPropietarioDto>();
-
-
 
 
             }catch(Exception ex)

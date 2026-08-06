@@ -13,6 +13,7 @@ namespace Elysia.Core.Domain.interfaces
 
         Task<List<PlatoMenu?>> AddRangeAsync(List<PlatoMenu> platoMenus);
         Task<List<PlatoMenu?>> GetListByMenuId(int menuId);
+        Task<PlatoMenu?> GetListByPlatoId(int platoId);
 
     }
 }

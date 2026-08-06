@@ -18,8 +18,7 @@ namespace Elysia.Core.Application.Dtos.reservas
         public int MesaId { get; set; }
         [Range(1,int.MaxValue,ErrorMessage = "Debes indicar la cantidad de persona")]
         public int CantidadPersona { get; set; }
-        [Required(ErrorMessage = "Debes indicar el estado de la reserva")]
-        public EstadoReserva Estado { get; set; }
+
         [Required(ErrorMessage = "Debes indicar la fecha de la reserva")]
         public DateTime FechaReserva { get; set; }
         public string? Observaciones { get; set; }

@@ -102,7 +102,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
 
                 }
 
-                return Ok("Membresia editada correctamente");
+                return Ok("Membresia cambiada correctamente (Plan Premium)");
             }
             catch (Exception ex)
             {

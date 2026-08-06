@@ -17,10 +17,11 @@ namespace Elysia.Core.Application.Mapping.EntityToDtoMappingProfile
         public ShiftEntityToDtoMappingProfile()
         {
 
-            CreateMap<EditarEmpleadoDto, EditarEmpleadoRequestDto>().ReverseMap();
-            CreateMap<CreateEmpleadoDto, CreateEmpleadoRequestDto>().ReverseMap();
-            CreateMap<ShiftResponseDto, Shift>();
-      
+            CreateMap<ShiftResponseDto, Shift>().ReverseMap();
+            CreateMap<Shift,CreateShiftDto>().ReverseMap();
+            CreateMap<Shift, EditarShiftDto>().ReverseMap();
+            CreateMap<CreateShiftDto,CreateShiftRequestDto >().ReverseMap();
+            CreateMap<EditarShiftRequestDto,EditarShiftDto >().ReverseMap();
         }
 
     }

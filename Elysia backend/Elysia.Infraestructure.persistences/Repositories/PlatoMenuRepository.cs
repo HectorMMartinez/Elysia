@@ -74,15 +74,15 @@ namespace Elysia.Infraestructure.persistences.Repositories
             }
         }
 
+        public async Task<PlatoMenu?> GetListByPlatoId(int platoId)
+        {
+            var data = await context.Set<PlatoMenu>().Where(x => x.IdPlato == platoId).FirstAsync();
+            if(data != null)
+            {
+                return data;
+            }
 
-
-
-
-
-
-
-
-
-
+            return null;
+        }
     }
 }

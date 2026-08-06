@@ -217,7 +217,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
                     return Ok("Empleado elimindao correctamente");
                 }
 
-                return NotFound("Ocurrio un problema al eliminar, no se encontro o no se elimino");
+                return NotFound("Ocurrio un problema al eliminar, no se encontro  un empleado con ese id o no se elimino");
 
             }
             catch (Exception ex)
