@@ -14,7 +14,7 @@ namespace Elysia.Core.Application.Dtos.User
         public required string Name { get; set; }
         [Required(ErrorMessage = "Debes ingresar el apellido")]
         public required string LastName { get; set; }
-        [Required(ErrorMessage = "debes ingresar el correo")]
+  
         public required string Email { get; set; }
         [Required(ErrorMessage = "Debes ingresar el nombre de usuario")]
         public required string UserName { get; set; }

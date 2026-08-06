@@ -48,6 +48,19 @@ namespace Elysia.Infraestructure.persistences.Repositories
         }
 
 
+        public async Task<List<Producto>> GetListProductosByPropietarioid(string propietarioId)
+        {
+            var data = await context.Set<Producto>().Where(x => x.IdPropietario == propietarioId).ToListAsync();
+
+            if (data.Any())
+            {
+                return data;
+            }
+
+            return new List<Producto>();
+        }
+
+
       
     }
 }

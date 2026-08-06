@@ -1,4 +1,5 @@
 ﻿using Elysia.Core.Application.Dtos.pedido;
+using Elysia.Core.Domain.Common;
 using Elysia.Core.Domain.Entities;
 
 
@@ -14,5 +15,6 @@ namespace Elysia.Core.Application.Interfaces
         Task<List<MostrarPedidoConPlatosDto>> GetAllPedidosFinalizado(string propietarioId);
         Task<MostrarPedidoConPlatosDto> GetPedidoConPlatosByPedidoId(int pedidoId);
         Task<List<MostrarPedidoConPlatosDto>> GetPedidoConPlatosByPropietarioId(string propietarioId);
+        Task<bool> CambiarEstadoAsync(int id, EstadoPedido estado);
     }
 }

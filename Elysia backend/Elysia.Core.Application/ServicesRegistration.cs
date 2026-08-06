@@ -39,6 +39,7 @@ namespace Elysia.Core.Application
             services.AddScoped<IPuestoService,PuestoService>();
             services.AddScoped<IEmpleadoService, EmpleadoService>();
             services.AddScoped<IShiftService,ShiftService>();
+            services.AddScoped<IShiftEmpleadoService, ShiftEmpleadoService>();
             #endregion
 
 

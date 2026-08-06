@@ -418,6 +418,32 @@ namespace Elysia.Core.Application.Services
 
 
 
+        public async Task<bool> CambiarEstadoAsync(int id, EstadoReserva estado)
+        {
+            try
+            {
+
+
+                if (estado != EstadoReserva.EnProceso && estado != EstadoReserva.Finalizada && estado != EstadoReserva.Cancelada && estado != EstadoReserva.NoAsistio)
+                {
+                    return false;
+
+                }
+
+
+                return await repo.CambiarEstadoAsync(id, estado);
+
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("Ocurrio un error al intentar cambiar el estado de la reserva, favor verificar" + ex.Message);
+
+            }
+
+        }
+
 
 
 

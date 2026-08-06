@@ -1,4 +1,5 @@
-﻿using Elysia.Core.Domain.Entities;
+﻿using Elysia.Core.Domain.Common;
+using Elysia.Core.Domain.Entities;
 using ReservaBook.Core.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ namespace Elysia.Core.Domain.interfaces
         Task<List<Pedido>> GetAllPedidosEnProceso(string propietarioId); 
         Task<List<Pedido>> GetAllPedidosByMesaId(int mesaId);
         Task<List<Pedido>> GetAllPedidosFinalizado(string propietarioId);
+        Task<bool> CambiarEstadoAsync(int id, EstadoPedido estado);
 
 
     }

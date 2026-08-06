@@ -5,6 +5,8 @@ namespace Elysia.Core.Application.Dtos.membresia
 {
     public class EditMembresiaDto
     {
+     
+        public int Id { get; set; }
         public required string UsuarioId { get; set; }
         public required int PlanId { get; set; }
         public required DateTime FechaInicio { get; set; }

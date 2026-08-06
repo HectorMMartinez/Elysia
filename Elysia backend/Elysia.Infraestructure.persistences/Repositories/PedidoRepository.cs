@@ -36,7 +36,8 @@ namespace Elysia.Infraestructure.persistences.Repositories
         }
 
 
-
+    
+      
         public async  Task<List<Pedido>> GetAllPedidosCancelados(string propietarioId)
         {
 
@@ -143,6 +144,20 @@ namespace Elysia.Infraestructure.persistences.Repositories
         }
 
 
+        //cambiar el estado de un pedido
+        public async Task<bool> CambiarEstadoAsync(int id, EstadoPedido estado)
+        {
+            var pedido = await context.Set<Pedido>().FindAsync(id);
 
+            if (pedido != null)
+            {
+                pedido.Estado = estado;
+                await context.SaveChangesAsync();
+                return true;
+            }
+
+
+            return false;
+        }
     }
 }

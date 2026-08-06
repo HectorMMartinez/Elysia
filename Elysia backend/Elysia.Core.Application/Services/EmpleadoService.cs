@@ -54,6 +54,23 @@ namespace Elysia.Core.Application.Services
                     return response;
                 }
 
+                var totalData = await empleadoRepository.GetlAllAsync();
+                if(totalData.Any(x => x.Email == entity.Email))
+                {
+                    response.HasError = true;
+                    response.Errors.Add("Ya existe un empleado registrado con ese correo");
+                    return response;
+
+                }
+
+                if (totalData.Any(x => x.Phone == entity.Phone))
+                {
+                    response.HasError = true;
+                    response.Errors.Add("Ya existe un empleado registrado con ese numero de telefono");
+                    return response;
+
+                }
+
 
                 if (!entity.Email.Contains("@"))
                 {
@@ -62,10 +79,10 @@ namespace Elysia.Core.Application.Services
                     return response;
                 }
 
-                if(entity.Phone.Length != 11)
+                if(entity.Phone.Length != 10)
                 {
                     response.HasError = true;
-                    response.Errors.Add("Debes indicar un numero de telefono valido, 11 digitos sin guiones");
+                    response.Errors.Add("Debes indicar un numero de telefono valido, 10 digitos sin guiones");
                     return response;
                 }
 
@@ -77,15 +94,13 @@ namespace Elysia.Core.Application.Services
                     return response;
                 }
 
-
+                entity.IsActive = true;
                 var data = await base.AddAsync(entity);
                 if (data != null)
-                {
-
-                    var map = _mapper.Map<EmpleadoResponseDto>(data);
-                    map.Errors = [];
-                    map.HasError = false;
-                    return map;
+                { 
+                    data.Errors = [];
+                    data.HasError = false;
+                    return data;
                    
                 }
 
@@ -133,6 +148,22 @@ namespace Elysia.Core.Application.Services
                     return response;
                 }
 
+                var totalData = await empleadoRepository.GetlAllAsync();
+                if (totalData.Any(x => x.Email == entity.Email && x.Id != id))
+                {
+                    response.HasError = true;
+                    response.Errors.Add("Ya existe un empleado registrado con ese correo");
+                    return response;
+
+                }
+
+                if (totalData.Any(x => x.Phone == entity.Phone && x.Id != id))
+                {
+                    response.HasError = true;
+                    response.Errors.Add("Ya existe un empleado registrado con ese numero de telefono");
+                    return response;
+
+                }
 
 
                 if (!string.IsNullOrEmpty(entity.Email) && !entity.Email.Contains("@"))
@@ -143,10 +174,10 @@ namespace Elysia.Core.Application.Services
                 }
 
 
-                if (!string.IsNullOrEmpty(entity.Phone) &&  entity.Phone.Length != 11)
+                if (!string.IsNullOrEmpty(entity.Phone) &&  entity.Phone.Length != 10)
                 {
                     response.HasError = true;
-                    response.Errors.Add("Debes indicar un numero de telefono valido, 11 digitos sin guiones");
+                    response.Errors.Add("Debes indicar un numero de telefono valido, 10 digitos sin guiones");
                     return response;
                 }
 
@@ -175,10 +206,10 @@ namespace Elysia.Core.Application.Services
                 var data = await base.UpdateAsync(entity.Id,entity);
                 if (data != null)
                 {
-                    var map = _mapper.Map<EmpleadoResponseDto>(data);
-                    map.Errors = [];
-                    map.HasError = false;
-                    return map;
+                   
+                    data.Errors = [];
+                    data.HasError = false;
+                    return data;
 
                 }
 
@@ -191,7 +222,6 @@ namespace Elysia.Core.Application.Services
 
             }
         }
-
 
 
 

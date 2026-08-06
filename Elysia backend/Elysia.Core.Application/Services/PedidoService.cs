@@ -745,6 +745,63 @@ namespace Elysia.Core.Application.Services
 
 
 
+        public async Task<bool> CambiarEstadoAsync(int id, EstadoPedido estado)
+        {
+            try
+            {
+
+
+                if (estado != EstadoPedido.Cancelado && estado != EstadoPedido.Finalizado && estado != EstadoPedido.Entregado && estado != EstadoPedido.EnPreparacion)
+                {
+                    return false;
+
+                }
+
+
+                return await pedidoRepository.CambiarEstadoAsync(id, estado);
+
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("Ocurrio un error al intentar cambiar el estado del pedido, favor verificar" + ex.Message);
+
+            }
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         #region private method
         private async Task<ResponsePedidoDto> ValidarYActualizarStockAsync(CreatePedidoDto dto)
         {

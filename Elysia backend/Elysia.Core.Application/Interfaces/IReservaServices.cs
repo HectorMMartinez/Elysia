@@ -1,4 +1,5 @@
 ﻿using Elysia.Core.Application.Dtos.reservas;
+using Elysia.Core.Domain.Common;
 using Elysia.Core.Domain.Entities;
 using Microsoft.AspNetCore.Identity.Data;
 using System;
@@ -16,5 +17,6 @@ namespace Elysia.Core.Application.Interfaces
         Task<List<ReservaResponseDto?>> GetReservasCanceladaByPropietario(string propietario);
         Task<List<ReservaResponseDto?>> GetReservasNoAsistioByPropietario(string propietario);
         Task<List<ReservaResponseDto?>> GetAllReservasByPropietario(string propietario);
+        Task<bool> CambiarEstadoAsync(int id, EstadoReserva estado);
     }
 }

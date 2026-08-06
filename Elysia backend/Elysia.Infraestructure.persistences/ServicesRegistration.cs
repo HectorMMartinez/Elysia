@@ -66,6 +66,7 @@ namespace Elysia.Infraestructure.persistences
             Service.AddScoped<IPuestoRepository, PuestoRepository>();
             Service.AddScoped<IEmpleadoRepository, EmpleadoRepository>();
             Service.AddScoped<IShiftRepository, ShiftRepository>();
+            Service.AddScoped<IShiftEmpleadoRepository, ShiftEmpleadoRepository>(); 
             #endregion
 
         }
@@ -81,6 +82,7 @@ namespace Elysia.Infraestructure.persistences
             var elysiaContext = serviceProvider.GetRequiredService<ElysiaContext>();
             await DefaultCategoriaPlato.SeedAsync(elysiaContext);   
             await DefaultPlanes.SeedAsync(elysiaContext);
+            await DefaultPuestoTrabajo.SeedAsync(elysiaContext);
         }
 
         #endregion

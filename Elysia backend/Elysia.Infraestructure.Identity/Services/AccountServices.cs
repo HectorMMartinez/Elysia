@@ -366,7 +366,7 @@ namespace Elysia.Infraestructure.Identity.Services
             }
 
 
-            if (saveUser.Phone!.Trim().Length != 10 || saveUser.PhoneRestaurante.Trim().Length != 10)
+            if (!string.IsNullOrEmpty(saveUser.Phone) && saveUser.Phone!.Trim().Length != 10 || !string.IsNullOrEmpty(saveUser.PhoneRestaurante) && saveUser.PhoneRestaurante.Trim().Length != 10)
             {
                 response.HasError = true;
                 response.Errors.Add("Los numeros de telefonos tienen que tener exactamente 10 digitos sin guiones");
@@ -377,7 +377,8 @@ namespace Elysia.Infraestructure.Identity.Services
 
 
 
-            if (saveUser.IdCard.Trim().Length != 11)
+
+            if (!string.IsNullOrEmpty(saveUser.IdCard) && saveUser.IdCard.Trim().Length != 11)
             {
                 response.HasError = true;
                 response.Errors.Add("La cedula o idcard debe tener exactamente 11 digitos sin guiones");
@@ -387,7 +388,7 @@ namespace Elysia.Infraestructure.Identity.Services
 
 
 
-            if (saveUser.RNC.Trim().Length != 9)
+            if (!string.IsNullOrEmpty(saveUser.RNC) && saveUser.RNC.Trim().Length != 9)
             {
                 response.HasError = true;
                 response.Errors.Add("El RNC debe tener exactamente 9 digitos sin guiones");
@@ -396,7 +397,7 @@ namespace Elysia.Infraestructure.Identity.Services
             }
 
 
-            var validateInformationUser = await ValidateInformationUserExist(saveUser.Phone, saveUser.IdCard, true, user.Id);
+            var validateInformationUser = await ValidateInformationUserExist(!string.IsNullOrEmpty(saveUser.Phone) ? saveUser.Phone : "",!string.IsNullOrEmpty(saveUser.IdCard) ? saveUser.IdCard : "", true, user.Id);
             if (validateInformationUser != null && validateInformationUser!.Count > 0)
             {
                 response.HasError = true;
@@ -407,7 +408,7 @@ namespace Elysia.Infraestructure.Identity.Services
 
 
 
-            var validateRestaurantInformation = await ValidateInformationRestauranteExist(saveUser.PhoneRestaurante, saveUser.NombreRestaurante, saveUser.RNC, saveUser.DireccionRestaurante, true, user.Id);
+            var validateRestaurantInformation = await ValidateInformationRestauranteExist(!string.IsNullOrEmpty(saveUser.PhoneRestaurante) ? saveUser.PhoneRestaurante : "",!string.IsNullOrEmpty(saveUser.NombreRestaurante) ? saveUser.NombreRestaurante : "", !string.IsNullOrEmpty(saveUser.RNC) ? saveUser.RNC : "", !string.IsNullOrEmpty(saveUser.DireccionRestaurante) ? saveUser.DireccionRestaurante : "", true, user.Id);
             if (validateRestaurantInformation != null && validateRestaurantInformation!.Count > 0)
             {
                 response.HasError = true;
@@ -416,7 +417,7 @@ namespace Elysia.Infraestructure.Identity.Services
             }
 
 
-
+            
             user.Name = !string.IsNullOrWhiteSpace(saveUser.Name) ? saveUser.Name : user.Name;
             user.LastName = !string.IsNullOrWhiteSpace(saveUser.LastName) ? saveUser.LastName : user.LastName;
             user.PhoneNumber = !string.IsNullOrWhiteSpace(saveUser.Phone) ? saveUser.Phone : user.PhoneNumber;
@@ -492,8 +493,8 @@ namespace Elysia.Infraestructure.Identity.Services
 
                     var templatePath = Path.Combine(
                            AppContext.BaseDirectory, "wwwroot",
-                          "EmailTemplates",
-                          "ConfirmYourAccount.html");
+                          "Template",
+                          "ConfirmAccountPage.html");
 
 
                     var html = await File.ReadAllTextAsync(templatePath);
@@ -605,13 +606,14 @@ namespace Elysia.Infraestructure.Identity.Services
 
                 user.IsActive = true;
                 user.EmailConfirmed = true;
+                await userManager.UpdateAsync(user);
                 response.HasError = false;
                 response.Message = "Usuario activado correctamente";
                 return response;
             }
 
             response.HasError = true;
-            response.Errors.Add("Ucurrio un error al intentar activar el usuario, no se pudo encontrar el usuario indicado");
+            response.Errors.Add("Ocurrio un error al intentar activar el usuario, no se pudo encontrar el usuario indicado");
             return response;
 
         }
@@ -628,13 +630,15 @@ namespace Elysia.Infraestructure.Identity.Services
             {
 
                 user.IsActive = false;
+                user.EmailConfirmed = false;
+                await userManager.UpdateAsync(user);
                 response.HasError = false;
                 response.Message = "Usuario desativado correctamente";
                 return response;
             }
 
             response.HasError = true;
-            response.Errors.Add("Ucurrio un error al intentar desativar el usuario, no se pudo encontrar el usuario indicado");
+            response.Errors.Add("Ocurrio un error al intentar desativar el usuario, no se pudo encontrar el usuario indicado");
             return response;
 
         }
@@ -682,14 +686,14 @@ namespace Elysia.Infraestructure.Identity.Services
                     LastName = item.LastName,
                     Email = item.Email ?? "",
                     IsActive = item.EmailConfirmed,
-                    NombreRestaurante = item.NombreRestaurante,
-                    RNC = item.RNC,
-                    LogoRestaurante = item.LogoRestaurante,
-                    DireccionRestaurante = item.DireccionRestaurante,
-                    HoraApertura = item.HoraApertura.Value,
-                    HoraCierre = item.HoraCierre.Value,
-                    PhoneRestaurante = item.PhoneRestaurante,
-                    IdCard = item.IdCard,
+                    NombreRestaurante = item.NombreRestaurante ?? "",
+                    RNC = item.RNC ?? "",
+                    LogoRestaurante = item.LogoRestaurante ?? "",
+                    DireccionRestaurante = item.DireccionRestaurante ?? "",
+                    HoraApertura = item.HoraApertura ?? new TimeOnly(0,0),
+                    HoraCierre = item.HoraCierre ?? new TimeOnly(0,0),
+                    PhoneRestaurante = item.PhoneRestaurante ?? "",
+                    IdCard = item.IdCard ?? "",
                     Phone = item.PhoneNumber ?? "",
                     ProfileImage = item.ProfileImage,
                     Role = rolesList.FirstOrDefault() ?? ""
@@ -706,7 +710,7 @@ namespace Elysia.Infraestructure.Identity.Services
         }
 
 
-        public async Task<List<UserDto>> GetAllUserPropietario(bool? IsActive = true)
+        public async Task<List<UserDto>> GetAllUserPropietario()
         {
 
             var users = userManager.Users;
@@ -719,17 +723,6 @@ namespace Elysia.Infraestructure.Identity.Services
 
 
             List<UserDto> ListUserDto = [];
-            if (IsActive!.Value && IsActive != null)
-            {
-                users = users.Where(u => u.EmailConfirmed);
-
-            }
-            else
-            {
-                users = users.Where(u => !u.EmailConfirmed);
-            }
-
-
             var ListUser = await users.ToListAsync();
 
 
@@ -747,15 +740,15 @@ namespace Elysia.Infraestructure.Identity.Services
                     UserName = item.UserName ?? "",
                     LastName = item.LastName,
                     Email = item.Email ?? "",
-                    IsActive = item.EmailConfirmed,
-                    NombreRestaurante = item.NombreRestaurante,
-                    RNC = item.RNC,
-                    LogoRestaurante = item.LogoRestaurante,
-                    DireccionRestaurante = item.DireccionRestaurante,
-                    HoraApertura = item.HoraApertura.Value,
-                    HoraCierre = item.HoraCierre.Value,
-                    PhoneRestaurante = item.PhoneRestaurante,
-                    IdCard = item.IdCard,
+                    IsActive = item.IsActive,
+                    NombreRestaurante = item.NombreRestaurante ?? "",
+                    RNC = item.RNC ?? "",
+                    LogoRestaurante = item.LogoRestaurante ?? "",
+                    DireccionRestaurante = item.DireccionRestaurante ?? "",
+                    HoraApertura = item.HoraApertura ?? new TimeOnly(0, 0),
+                    HoraCierre = item.HoraCierre ?? new TimeOnly(0, 0),
+                    PhoneRestaurante = item.PhoneRestaurante ?? "",
+                    IdCard = item.IdCard ?? "",
                     Phone = item.PhoneNumber ?? "",
                     ProfileImage = item.ProfileImage,
                     Role = rolesList.FirstOrDefault() ?? ""
@@ -774,7 +767,7 @@ namespace Elysia.Infraestructure.Identity.Services
 
 
 
-        public async Task<List<UserDto>> GetAllUserAdmin(bool? IsActive = true)
+        public async Task<List<UserDto>> GetAllUserAdmin()
         {
 
             var users = userManager.Users;
@@ -787,17 +780,6 @@ namespace Elysia.Infraestructure.Identity.Services
 
 
             List<UserDto> ListUserDto = [];
-            if (IsActive!.Value && IsActive != null)
-            {
-                users = users.Where(u => u.EmailConfirmed);
-
-            }
-            else
-            {
-                users = users.Where(u => !u.EmailConfirmed);
-            }
-
-
             var ListUser = await users.ToListAsync();
 
 
@@ -816,14 +798,14 @@ namespace Elysia.Infraestructure.Identity.Services
                     LastName = item.LastName,
                     Email = item.Email ?? "",
                     IsActive = item.EmailConfirmed,
-                    NombreRestaurante = item.NombreRestaurante,
-                    RNC = item.RNC,
-                    LogoRestaurante = item.LogoRestaurante,
-                    DireccionRestaurante = item.DireccionRestaurante,
-                    HoraApertura = item.HoraApertura.Value,
-                    HoraCierre = item.HoraCierre.Value,
-                    PhoneRestaurante = item.PhoneRestaurante,
-                    IdCard = item.IdCard,
+                    NombreRestaurante = item.NombreRestaurante ?? "",
+                    RNC = item.RNC ?? "",
+                    LogoRestaurante = item.LogoRestaurante ?? "",
+                    DireccionRestaurante = item.DireccionRestaurante ?? "",
+                    HoraApertura = item.HoraApertura ?? new TimeOnly(0, 0),
+                    HoraCierre = item.HoraCierre ?? new TimeOnly(0, 0),
+                    PhoneRestaurante = item.PhoneRestaurante ?? "",
+                    IdCard = item.IdCard ?? "",
                     Phone = item.PhoneNumber ?? "",
                     ProfileImage = item.ProfileImage,
                     Role = rolesList.FirstOrDefault() ?? ""
@@ -867,14 +849,14 @@ namespace Elysia.Infraestructure.Identity.Services
                 LastName = user.LastName,
                 Email = user.Email ?? "",
                 IsActive = user.EmailConfirmed,
-                NombreRestaurante = user.NombreRestaurante,
-                RNC = user.RNC,
-                LogoRestaurante = user.LogoRestaurante,
-                DireccionRestaurante = user.DireccionRestaurante,
-                HoraApertura = user.HoraApertura.Value,
-                HoraCierre = user.HoraCierre.Value,
-                PhoneRestaurante = user.PhoneRestaurante,
-                IdCard = user.IdCard,
+                NombreRestaurante = user.NombreRestaurante ?? "",
+                RNC = user.RNC ?? "",
+                LogoRestaurante = user.LogoRestaurante ?? "",
+                DireccionRestaurante = user.DireccionRestaurante ?? "",
+                HoraApertura = user.HoraApertura ?? new TimeOnly(0, 0),
+                HoraCierre = user.HoraCierre ?? new TimeOnly(0, 0),
+                PhoneRestaurante = user.PhoneRestaurante ?? "",
+                IdCard = user.IdCard ?? "",
                 Phone = user.PhoneNumber ?? "",
                 ProfileImage = user.ProfileImage,
                 Role = rolesList.FirstOrDefault() ?? ""
@@ -911,14 +893,14 @@ namespace Elysia.Infraestructure.Identity.Services
                 LastName = user.LastName,
                 Email = user.Email ?? "",
                 IsActive = user.EmailConfirmed,
-                NombreRestaurante = user.NombreRestaurante,
-                RNC = user.RNC,
-                LogoRestaurante = user.LogoRestaurante,
-                DireccionRestaurante = user.DireccionRestaurante,
-                HoraApertura = user.HoraApertura.Value,
-                HoraCierre = user.HoraCierre.Value,
-                PhoneRestaurante = user.PhoneRestaurante,
-                IdCard = user.IdCard,
+                NombreRestaurante = user.NombreRestaurante ?? "",
+                RNC = user.RNC ?? "",
+                LogoRestaurante = user.LogoRestaurante ?? "",
+                DireccionRestaurante = user.DireccionRestaurante ?? "",
+                HoraApertura = user.HoraApertura ?? new TimeOnly(0, 0),
+                HoraCierre = user.HoraCierre ?? new TimeOnly(0, 0),
+                PhoneRestaurante = user.PhoneRestaurante ?? "",
+                IdCard = user.IdCard ?? "",
                 Phone = user.PhoneNumber ?? "",
                 ProfileImage = user.ProfileImage,
                 Role = rolesList.FirstOrDefault() ?? ""
@@ -955,14 +937,14 @@ namespace Elysia.Infraestructure.Identity.Services
                 LastName = user.LastName,
                 Email = user.Email ?? "",
                 IsActive = user.EmailConfirmed,
-                NombreRestaurante = user.NombreRestaurante,
-                RNC = user.RNC,
-                LogoRestaurante = user.LogoRestaurante,
-                DireccionRestaurante = user.DireccionRestaurante,
-                HoraApertura = user.HoraApertura.Value,
-                HoraCierre = user.HoraCierre.Value,
-                PhoneRestaurante = user.PhoneRestaurante,
-                IdCard = user.IdCard,
+                NombreRestaurante = user.NombreRestaurante ?? "",
+                RNC = user.RNC ?? "",
+                LogoRestaurante = user.LogoRestaurante ?? "",
+                DireccionRestaurante = user.DireccionRestaurante ?? "",
+                HoraApertura = user.HoraApertura ?? new TimeOnly(0, 0),
+                HoraCierre = user.HoraCierre ?? new TimeOnly(0, 0),
+                PhoneRestaurante = user.PhoneRestaurante ?? "",
+                IdCard = user.IdCard ?? "",
                 Phone = user.PhoneNumber ?? "",
                 ProfileImage = user.ProfileImage,
                 Role = rolesList.FirstOrDefault() ?? ""
@@ -1192,14 +1174,14 @@ namespace Elysia.Infraestructure.Identity.Services
                     if (user.Id != usuarioId)
                     {
 
-                        if (user.PhoneRestaurante == telefono) ListMessage.Add("El telefono del restaurante ya esta registrado, favor verificar");
+                        if (!string.IsNullOrEmpty(user.PhoneRestaurante) && user.PhoneRestaurante == telefono) ListMessage.Add("El telefono del restaurante ya esta registrado, favor verificar");
 
-                        if (user.NombreRestaurante == nombre) ListMessage.Add("El nombre del restaurante ya esta registrado, favor verificar");
+                        if (!string.IsNullOrEmpty(user.NombreRestaurante) && user.NombreRestaurante == nombre) ListMessage.Add("El nombre del restaurante ya esta registrado, favor verificar");
 
-                        if (user.RNC == rnc) ListMessage.Add("El RNC del restaurante ya esta registrado, favor verificar");
+                        if (!string.IsNullOrEmpty(user.RNC) && user.RNC == rnc) ListMessage.Add("El RNC del restaurante ya esta registrado, favor verificar");
 
 
-                        if (user.DireccionRestaurante == direccion) ListMessage.Add("La direccion del restaurante ya esta registrada, favor verificar");
+                        if (!string.IsNullOrEmpty(user.DireccionRestaurante) && user.DireccionRestaurante == direccion) ListMessage.Add("La direccion del restaurante ya esta registrada, favor verificar");
                     }
 
                 }
@@ -1211,14 +1193,14 @@ namespace Elysia.Infraestructure.Identity.Services
 
                 foreach (var user in restaurantes)
                 {
-                    if (user.PhoneRestaurante == telefono) ListMessage.Add("El telefono del restaurante ya esta registrado, favor verificar");
+                    if (!string.IsNullOrEmpty(user.PhoneRestaurante) && user.PhoneRestaurante == telefono) ListMessage.Add("El telefono del restaurante ya esta registrado, favor verificar");
 
-                    if (user.NombreRestaurante == nombre) ListMessage.Add("El nombre del restaurante ya esta registrado, favor verificar");
+                    if (!string.IsNullOrEmpty(user.NombreRestaurante) && user.NombreRestaurante == nombre) ListMessage.Add("El nombre del restaurante ya esta registrado, favor verificar");
 
-                    if (user.RNC == rnc) ListMessage.Add("El RNC del restaurante ya esta registrado, favor verificar");
+                    if (!string.IsNullOrEmpty(user.RNC) && user.RNC == rnc) ListMessage.Add("El RNC del restaurante ya esta registrado, favor verificar");
 
 
-                    if (user.DireccionRestaurante == direccion) ListMessage.Add("La direccion del restaurante ya esta registrada, favor verificar");
+                    if (!string.IsNullOrEmpty(user.DireccionRestaurante) && user.DireccionRestaurante == direccion) ListMessage.Add("La direccion del restaurante ya esta registrada, favor verificar");
 
                 }
 
@@ -1245,9 +1227,9 @@ namespace Elysia.Infraestructure.Identity.Services
                     if (user.Id != usuarioId)
                     {
 
-                        if (user.PhoneNumber == telefono) ListMessage.Add("El telefono del usuario ya esta registrado, favor verificar");
+                        if (!string.IsNullOrEmpty(user.PhoneNumber) && user.PhoneNumber == telefono) ListMessage.Add("El telefono del usuario ya esta registrado, favor verificar");
 
-                        if (user.IdCard == idCard) ListMessage.Add("La cedula del usuario ya esta registrado, favor verificar");
+                        if (!string.IsNullOrEmpty(user.IdCard) && user.IdCard == idCard) ListMessage.Add("La cedula del usuario ya esta registrado, favor verificar");
 
                     }
                 }
@@ -1259,9 +1241,9 @@ namespace Elysia.Infraestructure.Identity.Services
 
                 foreach (var user in restaurantes)
                 {
-                    if (user.PhoneNumber == telefono) ListMessage.Add("El telefono del usuario ya esta registrado, favor verificar");
+                    if (!string.IsNullOrEmpty(user.PhoneNumber) && user.PhoneNumber == telefono) ListMessage.Add("El telefono del usuario ya esta registrado, favor verificar");
 
-                    if (user.IdCard == idCard) ListMessage.Add("la cedula del usuario  ya esta registrado, favor verificar");
+                    if (!string.IsNullOrEmpty(user.IdCard) && user.IdCard == idCard) ListMessage.Add("la cedula del usuario  ya esta registrado, favor verificar");
 
                 }
 

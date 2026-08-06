@@ -119,8 +119,7 @@ namespace Elysia.Core.Application.Services
 
 
                 var result = await base.AddAsync(entity);
-                var map = _mapper.Map<ShiftResponseDto>(result);
-                return map;
+                return result;
 
             }
             catch (Exception ex)
@@ -132,6 +131,7 @@ namespace Elysia.Core.Application.Services
             }
 
         }
+
 
         public async Task<List<ShiftResponseDto>?> GetAllTurnoByPropietarioId(string PropietarioId)
         {
@@ -243,7 +243,7 @@ namespace Elysia.Core.Application.Services
                         return response;
                     }
 
-                    if (entity.StartTime < item.EndTime && entity.EndTime > item.StartTime)
+                    if (entity.StartTime < item.EndTime && entity.EndTime > item.StartTime && item.Id != id)
                     {
                         response.HasError = true;
                         response.Errors.Add(
@@ -257,8 +257,7 @@ namespace Elysia.Core.Application.Services
                 entity.PropietarioId = restaurante_Exist.Id;
                 entity.Id = turno_exist.Id;
                 var result = await base.UpdateAsync(entity.Id,entity);
-                var map = _mapper.Map<ShiftResponseDto>(result);
-                return map;
+                return result;
 
             }
             catch (Exception ex)

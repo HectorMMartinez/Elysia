@@ -53,7 +53,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
 
 
         //obtener todas las tarjetas
-        [HttpGet("get-editar-tarjeta/{id}")]
+        [HttpPut("editar-tarjeta/{id}")]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType (StatusCodes.Status400BadRequest)]

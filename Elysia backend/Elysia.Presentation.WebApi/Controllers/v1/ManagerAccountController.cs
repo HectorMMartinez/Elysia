@@ -92,12 +92,12 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType (StatusCodes.Status400BadRequest)]   
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetUserById(string idUser)
+        public async Task<IActionResult> GetUserById(string id)
         {
             try
             {
 
-                if(idUser == null)
+                if(id == null)
                 {
                     return BadRequest("Debes indicar el id correctamente para consultar el usuario");
                 }
@@ -105,7 +105,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
 
 
 
-                var data = await accountServices.GetUserById(idUser);
+                var data = await accountServices.GetUserById(id);
                 if (data == null)
                 {
                     return NotFound("No existen usuario registrados con ese id");
@@ -124,6 +124,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
             }
 
         }
+
 
 
         //el admin puede activar un usuario
@@ -213,7 +214,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> EditarRestaurante(string id,EditarDatosRestaurante? dto)
+        public async Task<IActionResult> EditarRestaurante(string id, [FromForm] EditarDatosRestaurante? dto)
         {
             try
             {
@@ -234,13 +235,14 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
 
                 if(dto.LogoRestaurante != null)
                 {
-                    map.LogoRestaurante =FileHandler.Upload(dto.LogoRestaurante,user_exist.Id, "logoRestaurante",true);
+                    map.LogoRestaurante = FileHandler.Upload(dto.LogoRestaurante,user_exist.Id, "logoRestaurante",true);
                 }
                 else
                 {
                     map.LogoRestaurante = user_exist.LogoRestaurante;
                 }
-
+                map.Role = user_exist.Role;
+                map.Id = user_exist.Id;
                 var data = await accountServices.EditUser(map);
                 if (data == null || data.HasError)
                 {
@@ -266,20 +268,9 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
         //editar perfil usuario
-        [HttpPut("edit-perfil-propietario")]
+        [HttpPut("edit-perfil")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]   
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -312,6 +303,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
                 }
 
                 map.Id = user_id;
+                map.Role = user_exist.Role;
                 var data = await accountServices.EditUser(map);
                 if (data != null || data.HasError)
                 {
@@ -334,8 +326,8 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
 
 
         //obtener un propietario solo un propietario puede utilizar este enpoint
-        [HttpGet("get-perfil-propietario-by-id")]
-        [Authorize(Roles = "Propietario")]
+        [HttpGet("get-perfil-usuario")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]

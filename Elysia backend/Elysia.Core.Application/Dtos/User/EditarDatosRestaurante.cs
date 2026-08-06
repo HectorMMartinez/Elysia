@@ -10,11 +10,11 @@ namespace Elysia.Core.Application.Dtos.User
 {
     public class EditarDatosRestaurante
     {
-        [Required(ErrorMessage = "Debes ingresar el RNC del negocio")]
+        //opcional al editar
         public required string RNC { get; set; }
         [Required(ErrorMessage = "Debes ingresar el nombre del restaurante")]
         public required string NombreRestaurante { get; set; }
-        [Required(ErrorMessage = "Debes ingresar el logo del restaurante")]
+        //opcional al editar
         public IFormFile? LogoRestaurante { get; set; } //restaurante
         [Required(ErrorMessage = "Debes ingresar la cedula")]
         public required string IdCard { get; set; } //propietario o usuario
