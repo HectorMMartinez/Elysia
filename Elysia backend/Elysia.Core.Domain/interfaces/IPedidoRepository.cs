@@ -21,6 +21,7 @@ namespace Elysia.Core.Domain.interfaces
         Task<List<Pedido>> GetAllPedidosByMesaId(int mesaId);
         Task<List<Pedido>> GetAllPedidosFinalizado(string propietarioId);
         Task<bool> CambiarEstadoAsync(int id, EstadoPedido estado);
+        Task<List<Pedido>> GetPedidosByPropietarioAndFecha(string propietarioId, DateTime fechaDesde, DateTime? fechaHasta = null);
 
 
     }

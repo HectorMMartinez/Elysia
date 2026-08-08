@@ -148,6 +148,25 @@ namespace Elysia.Infraestructure.persistences.Repositories
 
             return [];
         }
+
+
+
+        public async Task<List<Reserva>> GetReservasByPropietarioAndFecha(string propietarioId,DateTime fechaDesde,DateTime? fechaHasta = null)
+        {
+            var query = context.Reservas
+                .AsNoTracking()
+                .Where(r => r.IdPropietario == propietarioId
+                         && r.FechaReserva >= fechaDesde);
+
+            if (fechaHasta.HasValue)
+            {
+                query = query.Where(r => r.FechaReserva <= fechaHasta.Value);
+            }
+
+            return await query
+                .OrderByDescending(r => r.FechaReserva)
+                .ToListAsync();
+        }
     }
 
 }

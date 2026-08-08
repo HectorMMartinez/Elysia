@@ -19,6 +19,7 @@ namespace Elysia.Core.Domain.interfaces
         Task<List<Reserva?>> GetAllReservasByPropietario(string propietario);
         Task<List<Reserva?>> GetAllReservasByMesaId(int mesaId);
         Task<bool> CambiarEstadoAsync(int id, EstadoReserva estado);
+        Task<List<Reserva>> GetReservasByPropietarioAndFecha(string propietarioId, DateTime fechaDesde, DateTime? fechaHasta = null);
 
 
     }

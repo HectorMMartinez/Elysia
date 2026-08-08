@@ -1,6 +1,8 @@
 ﻿using Elysia.Core.Application.Interfaces;
 using Elysia.Core.Application.Services;
 using Elysia.Core.Domain.Entities;
+using Elysia.Core.Domain.Settings;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -40,6 +42,10 @@ namespace Elysia.Core.Application
             services.AddScoped<IEmpleadoService, EmpleadoService>();
             services.AddScoped<IShiftService,ShiftService>();
             services.AddScoped<IShiftEmpleadoService, ShiftEmpleadoService>();
+            services.AddScoped<ICenterIAService, CenterIAService>();
+            services.AddScoped<IDashboardPropietarioServices, DashboardPropietarioServices>();
+
+
             #endregion
 
 

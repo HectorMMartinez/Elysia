@@ -1,4 +1,5 @@
 using Elysia.Core.Application;
+using Elysia.Infraestructure.CenterIA;
 using Elysia.Infraestructure.Identity;
 using Elysia.Infraestructure.persistences;
 using Elysia.Infraestructure.Shared;
@@ -22,6 +23,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.AddPersistencesLayerIOC(builder.Configuration);
+builder.Services.AddCenterIdLayerIOCForWebApi(builder.Configuration);
 builder.Services.AddHealthChecks();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddApiVersioning();
