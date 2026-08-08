@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Elysia.Core.Application\Elysia.Core.Application.csproj" />
     <ProjectReference Include="..\Elysia.Core.Domain\Elysia.Core.Domain.csproj" />
+    <ProjectReference Include="..\Elysia.Infraestructure.persistences\Elysia.Infraestructure.persistences.csproj" />
   </ItemGroup>
 
 </Project>

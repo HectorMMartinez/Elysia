@@ -41,7 +41,7 @@ namespace Elysia.Infraestructure.persistences.Repositories
 
             if (membresia== null)
             {
-                return null!;
+                return null;
 
             }
 

@@ -25,8 +25,9 @@ namespace Elysia.Core.Application.Services
         private readonly IPlatoRepository platoRepository;
         private readonly IPlanRepository planRepository;
         private readonly IMembresiaRepository membresiaRepository;
+        private readonly IAccountServices accountServices;  
 
-        public DashboardPropietarioServices(IMembresiaRepository membresiaRepository, IPlanRepository lanRepository, IReservasRepository reservasRepository, IPedidoRepository pedidoRepository, IEmpleadoRepository empleadoRepository, IShiftRepository shiftRepository, IShiftEmpleadoRepository shiftEmpleadoRepository, IPuestoRepository puestRepository, IMenuRepository menuRepository, IPlatoMenuRepository platoMenuRepository, IMesaRepository mesaRepository, IProductoRepository productoRepository, IPlatoRepository platoRepository)
+        public DashboardPropietarioServices(IAccountServices accountServices,IMembresiaRepository membresiaRepository, IPlanRepository lanRepository, IReservasRepository reservasRepository, IPedidoRepository pedidoRepository, IEmpleadoRepository empleadoRepository, IShiftRepository shiftRepository, IShiftEmpleadoRepository shiftEmpleadoRepository, IPuestoRepository puestRepository, IMenuRepository menuRepository, IPlatoMenuRepository platoMenuRepository, IMesaRepository mesaRepository, IProductoRepository productoRepository, IPlatoRepository platoRepository)
         {
             this.reservasRepository = reservasRepository;
             this.pedidoRepository = pedidoRepository;
@@ -42,6 +43,7 @@ namespace Elysia.Core.Application.Services
             this.platoRepository = platoRepository;
             planRepository = lanRepository;
             this.membresiaRepository = membresiaRepository;
+            this.accountServices = accountServices;
 
         }
 
@@ -72,6 +74,10 @@ namespace Elysia.Core.Application.Services
                 var empleadosActivos = await empleadoRepository.GetAllEmpleadosActivos(PropietarioId);
                 var empleadosInactivos = await empleadoRepository.GetAllEmpleadosInactivo(PropietarioId);
                 var turnos = await shiftRepository.GetAllTurnoByPropietarioId(PropietarioId);
+                var user = await accountServices.GetUserById(PropietarioId);
+                var mesasDisponibles = await mesaRepository.GetAllDisponibleXByPropietarioId(PropietarioId);
+                var mesaReservadas = await mesaRepository.GetAllReservadasXByPropietarioId(PropietarioId);
+                var mesasOcupadas = await mesaRepository.GetAllOcupadasXByPropietarioId(PropietarioId);
                 int empleadoAsociados = 0;
                 int platosAsociados = 0;
                 if (platos.Count() > 0)
@@ -130,7 +136,12 @@ namespace Elysia.Core.Application.Services
                         ReservasFinalizadas = reservasFinalizada.Count,
                         ReservasNoAsistio = reservasNoAsistio.Count,
                         TotalReservas = reservasNoAsistio.Count + reservasCanceladas.Count + reservasEnproceso.Count + reservasFinalizada.Count + reservasActivas.Count,
-                        PlatoAsociadoAUnMenu = platosAsociados
+                        PlatoAsociadoAUnMenu = platosAsociados,
+                        NamePropietario = user.UserName ?? "Usuario Desconocido",
+                        Image = user.ProfileImage ?? "https://res.cloudinary.com/dxjv0gq2f/image/upload/v1696460915/elysia/elysia_logo",
+                        MesasReservadas = mesaReservadas.Count,
+                        MesasOcupadas = mesasOcupadas.Count,
+                        MesasDisponibles = mesasDisponibles.Count
                     };
 
                     return (null,panel_simple);
@@ -167,7 +178,13 @@ namespace Elysia.Core.Application.Services
                         TotalEmpleados = empleadosActivos.Count + empleadosInactivos.Count,
                         CantidadPuesto = puesto.Count,
                         TotalTurno = turnos.Count,
-                        TotalEmpleadoAsociadosTurno = empleadoAsociados
+                        TotalEmpleadoAsociadosTurno = empleadoAsociados,
+                        NamePropietario = user.UserName ?? "Usuario Desconocido",
+                        Image = user.ProfileImage ?? "https://res.cloudinary.com/dxjv0gq2f/image/upload/v1696460915/elysia/elysia_logo",
+                        MesasReservadas = mesaReservadas.Count,
+                        MesasOcupadas = mesasOcupadas.Count,
+                        MesasDisponibles = mesasDisponibles.Count
+
                     };
 
                       return (panel_premium,null);
@@ -184,6 +201,7 @@ namespace Elysia.Core.Application.Services
 
 
         }
+
 
     }
 }

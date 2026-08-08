@@ -10,6 +10,8 @@ namespace Elysia.Core.Application.Dtos.dashboard
     {
 
         public string AdminId { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Image { get; set; } = string.Empty;
         public int CantidadTarjetaVisa {  get; set; }
         public int CantidadTarjetaMastercard { get; set; }
         public int CantidadTarjetaAmericanExpress { get; set; }

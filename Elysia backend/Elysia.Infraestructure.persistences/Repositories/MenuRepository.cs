@@ -25,7 +25,7 @@ namespace Elysia.Infraestructure.persistences.Repositories
 
             if (!data.Any()) 
             {
-               return new List<Menu?> { null };
+               return new List<Menu?>();
             
             }
 

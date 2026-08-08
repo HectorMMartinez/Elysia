@@ -10,6 +10,8 @@ namespace Elysia.Core.Application.Dtos.dashboard
     {
 
         public string PropietarioId { get; set; } = string.Empty;
+        public string NamePropietario { get; set; } = string.Empty;
+        public string Image { get; set; } = string.Empty;
         public int PlanId { get; set; }
         public int ReservasActivas { get; set; }
         public int ReservasCanceladas { get; set; }
@@ -27,6 +29,9 @@ namespace Elysia.Core.Application.Dtos.dashboard
         public int CantidadProducto { get; set; }
         public int CantidadPlato { get; set; }
         public int CantidadMesa {  get; set; }
+        public int MesasDisponibles { get; set; }
+        public int MesasOcupadas { get; set; }
+        public int MesasReservadas { get; set; }
         public int CantidadMenu { get; set; }
         public int PlatoAsociadoAUnMenu { get; set; }
 
