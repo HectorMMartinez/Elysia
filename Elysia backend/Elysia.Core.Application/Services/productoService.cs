@@ -2,6 +2,7 @@
 using Elysia.Core.Application.Dtos.producto;
 using Elysia.Core.Application.Interfaces;
 using Elysia.Core.Domain.Entities;
+using Elysia.Core.Domain.interfaces;
 using ReservaBook.Core.Domain.Interfaces;
 
 namespace Elysia.Core.Application.Services
@@ -16,16 +17,17 @@ namespace Elysia.Core.Application.Services
         IProductoService
     {
         private readonly IMapper mapper;
-        private readonly IGenericRepository<Producto> productoRepository;
+        private readonly IProductoRepository productoRepository;
 
         public productoService(
-            IGenericRepository<Producto> genericRepository,
+             IProductoRepository productoRepository,
             IMapper mapper
-        ) : base(genericRepository, mapper)
+        ) : base(productoRepository, mapper)
         {
             this.mapper = mapper;
-            productoRepository = genericRepository;
+            this.productoRepository = productoRepository;
         }
+
 
         public override async Task<ProductoResponseDto?> AddAsync(
             CreateProductoDto? dto
@@ -107,6 +109,35 @@ namespace Elysia.Core.Application.Services
                 );
             }
         }
+
+        public async Task<List<ProductoResponseDto>> GetListProductosByPropietarioid(string propietarioId)
+        {
+            try
+            {
+                var listProducto = new List<ProductoResponseDto>();
+                var data = await productoRepository.GetListProductosByPropietarioid(propietarioId);
+                if(data.Count > 0)
+                {
+                    var map = mapper.Map<List<ProductoResponseDto>>(data);
+                    return map.ToList();
+                }
+
+
+                return listProducto;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new InvalidOperationException(
+                   $"Ocurrió un error al intentar obtener  los productos del propietario: {ex.Message}",
+                   ex
+               );
+
+            }
+        }
+
+
 
         public override async Task<ProductoResponseDto?> UpdateAsync(
             int id,

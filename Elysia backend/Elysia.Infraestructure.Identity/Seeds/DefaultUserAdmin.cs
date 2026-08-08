@@ -27,7 +27,7 @@ namespace Elysia.Infraestructure.Identity.Seeds
                 LastName = "Dev",
                 UserName = "Admin-dev", // sin espacios
                 Email = email,
-                ProfileImage = "https://res.cloudinary.com/dxjv0gq3e/image/upload/v1690911685/elysia/propietario",
+                ProfileImage = "https://i.pravatar.cc/150?img=33",
                 IsActive = true,
                 EmailConfirmed = true
             };

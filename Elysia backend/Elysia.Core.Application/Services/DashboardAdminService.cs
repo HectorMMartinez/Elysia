@@ -44,7 +44,7 @@ namespace Elysia.Core.Application.Services
                 var propietario = await accountServices.GetAllUserPropietario();
                 var tarjeta = await tarjetaRepository.GetlAllAsync();
                 var membresias = await membresiaRepository.GetlAllAsync();
-
+                var user = await accountServices.GetUserById(adminId);
                 var panel_admin = new MostrarIndicadoresDashboardAdmin()
                 {
                     AdminId = adminId,
@@ -59,7 +59,10 @@ namespace Elysia.Core.Application.Services
                     MembresiasActivas = membresias.Where(x => x.Estado == MembresiaEstado.Activa).Count(),
                     MembresiaSuspendida = membresias.Where(x => x.Estado == MembresiaEstado.Suspendida).Count(),
                     MembresiaVencida = membresias.Where(x => x.Estado == MembresiaEstado.Vencida).Count(),
-                    TotalMembresias = membresias.Where(x => x.Estado == MembresiaEstado.Cancelada).Count() + membresias.Where(x => x.Estado == MembresiaEstado.Activa).Count() + membresias.Where(x => x.Estado == MembresiaEstado.Suspendida).Count() + membresias.Where(x => x.Estado == MembresiaEstado.Vencida).Count()
+                    TotalMembresias = membresias.Where(x => x.Estado == MembresiaEstado.Cancelada).Count() + membresias.Where(x => x.Estado == MembresiaEstado.Activa).Count() + membresias.Where(x => x.Estado == MembresiaEstado.Suspendida).Count() + membresias.Where(x => x.Estado == MembresiaEstado.Vencida).Count(),
+                    Name = user.Name ?? "Usuario Desconocido",
+                    Image = user.ProfileImage ?? "https://res.cloudinary.com/dxj0gqf4k/image/upload/v1690911685/elysia/elysia-logo-.png"
+
                 };
 
 

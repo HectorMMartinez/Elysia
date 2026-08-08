@@ -33,7 +33,8 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         {
             try
             {
-                var data = await service.GetlAllAsync();
+                var userId = User.FindFirst("UId")!.Value;
+                var data = await service.GetListProductosByPropietarioid(userId);
 
                 if (data == null)
                 {

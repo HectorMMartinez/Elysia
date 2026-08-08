@@ -48,7 +48,7 @@ namespace Elysia.Infraestructure.persistences.Repositories
                 return data;
             }
 
-            return data;
+            return new List<Pedido>();
         }
 
         public async Task<List<Pedido>> GetAllPedidosEnProceso(string propietarioId)
@@ -77,7 +77,7 @@ namespace Elysia.Infraestructure.persistences.Repositories
 
             }
 
-            return data;
+            return new List<Pedido>();
 
         }
 

@@ -47,5 +47,50 @@ namespace Elysia.Infraestructure.persistences.Repositories
 
             return [];
         }
+
+
+        public async Task<List<Mesa>> GetAllDisponibleXByPropietarioId(string propietarioId)
+        {
+            var mesasDisponibles = await context.Set<Mesa>().Where(x => x.IdPropietario == propietarioId && x.Estado == MesaEstado.Disponible).ToListAsync();
+
+            if (mesasDisponibles.Any())
+            {
+                return mesasDisponibles;
+            }
+
+            return [];
+        }
+
+        public async Task<List<Mesa>> GetAllOcupadasXByPropietarioId(string propietarioId)
+        {
+            var mesasDisponibles = await context.Set<Mesa>().Where(x => x.IdPropietario == propietarioId && x.Estado == MesaEstado.Ocupada).ToListAsync();
+
+            if (mesasDisponibles.Any())
+            {
+                return mesasDisponibles;
+            }
+
+            return [];
+        }
+
+
+
+
+        public async Task<List<Mesa>> GetAllReservadasXByPropietarioId(string propietarioId)
+        {
+            var mesasDisponibles = await context.Set<Mesa>().Where(x => x.IdPropietario == propietarioId && x.Estado == MesaEstado.Reservada).ToListAsync();
+
+            if (mesasDisponibles.Any())
+            {
+                return mesasDisponibles;
+            }
+
+            return [];
+        }
+
+
+
+
+
     }
 }

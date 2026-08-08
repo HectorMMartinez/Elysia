@@ -5,6 +5,7 @@ using Elysia.Infraestructure.Identity.Contexts;
 using Elysia.Infraestructure.Identity.Entities;
 using Elysia.Infraestructure.Identity.Seeds;
 using Elysia.Infraestructure.Identity.Services;
+using Elysia.Infraestructure.persistences.Contexts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -160,12 +161,13 @@ namespace Elysia.Infraestructure.Identity
 
             var serviceProvider = scope.ServiceProvider;
 
+            var elysiaContext = serviceProvider.GetRequiredService<ElysiaContext>();
             var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
             await DefaultRoles.seedAsync(roleManager);
             await DefaultUserAdmin.seedAsync(userManager);  
-            await DefaultUserPropietario.seedAsync(userManager);    
+            await DefaultUserPropietario.seedAsync(userManager,elysiaContext);    
            
          
         }

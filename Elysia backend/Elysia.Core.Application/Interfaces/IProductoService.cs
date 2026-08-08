@@ -11,5 +11,7 @@ namespace Elysia.Core.Application.Interfaces
     public interface IProductoService : IGenericService<Producto,ProductoResponseDto,EditarProductoDto,CreateProductoDto>
     {
 
+        Task<List<ProductoResponseDto>> GetListProductosByPropietarioid(string propietarioId);
+
     }
 }
