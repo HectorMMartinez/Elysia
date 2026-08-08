@@ -70,18 +70,19 @@
 
 
         //elimina una imagen especifica
-        public static bool DeleteImage(string? imagePath)
+        public static bool DeleteImage(string imagePath)
         {
             if (string.IsNullOrWhiteSpace(imagePath))
-                return false;
+                return true;
 
-            string fullPath = Path.Combine(
+            var fullPath = Path.Combine(
                 Directory.GetCurrentDirectory(),
                 "wwwroot",
-                imagePath.Replace("/", Path.DirectorySeparatorChar.ToString()));
+                imagePath.TrimStart('/', '\\')
+            );
 
             if (!File.Exists(fullPath))
-                return false;
+                return true;
 
             File.Delete(fullPath);
 

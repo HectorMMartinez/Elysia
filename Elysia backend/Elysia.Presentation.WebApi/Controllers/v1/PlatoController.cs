@@ -195,7 +195,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
                     return NotFound("No se encontro un plato con ese id, Delete Failed");
                 }
 
-                if(plato.Imagen != null)
+                if(!string.IsNullOrWhiteSpace(plato.Imagen))
                 {
                     bool image_deleted =  FileHandler.Delete(user_id,plato.Imagen);
                     if(!image_deleted)
