@@ -242,7 +242,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
 
 
                 var data = await service.DeleteAsync(id);
-                if (mesa.Imagen != null)
+                if (!string.IsNullOrWhiteSpace(mesa.Imagen))
                 {
                     bool mesa_deleted =  FileHandler.DeleteImage(mesa.Imagen);
                     if (!mesa_deleted)

@@ -226,7 +226,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
                     return  BadRequest("No se pudo encontrar el producto especificado");
                 }
                 var response = await service.DeleteAsync(id);
-                if(producto.Imagen != null)
+                if(!string.IsNullOrWhiteSpace(producto.Imagen))
                 {
                     var imageDeleted = FileHandler.DeleteImage(producto.Imagen);
                     if (!imageDeleted)
