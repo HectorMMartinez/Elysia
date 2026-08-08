@@ -187,7 +187,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
                     return BadRequest("Debes especificar el plato a eliminar");
                 }
 
-
+                var user_id = User.FindFirst("UId")!.Value;
                 var plato = await platoService.GetByIdAsync(id);
                 var data = await platoService.DeleteAsync(id);
                 if (!data || plato == null)
@@ -195,7 +195,15 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
                     return NotFound("No se encontro un plato con ese id, Delete Failed");
                 }
 
-                FileHandler.DeleteImage(plato.Imagen);
+                if(plato.Imagen != null)
+                {
+                    bool image_deleted =  FileHandler.Delete(user_id,plato.Imagen);
+                    if(!image_deleted)
+                    {
+                        return StatusCode(StatusCodes.Status500InternalServerError, "No se pudo eliminar la imagen del plato");
+                    }
+                }
+
                 return NoContent();
 
             }
@@ -206,8 +214,6 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
 
             }
         }
-
-
 
 
 
