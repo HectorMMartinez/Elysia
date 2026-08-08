@@ -159,5 +159,25 @@ namespace Elysia.Infraestructure.persistences.Repositories
 
             return false;
         }
+
+
+      public async Task<List<Pedido>> GetPedidosByPropietarioAndFecha(string propietarioId, DateTime fechaDesde,DateTime? fechaHasta = null)
+        {
+            var query = context.Pedidos
+                .AsNoTracking()
+                .Include(p => p.DetallesPedidos)
+                    .ThenInclude(d => d.Plato)          // importante para sacar el nombre del plato
+                .Where(p => p.IdPropietario == propietarioId
+                         && p.FechaCreacion >= fechaDesde);
+
+            if (fechaHasta.HasValue)
+            {
+                query = query.Where(p => p.FechaCreacion <= fechaHasta.Value);
+            }
+
+            return await query
+                .OrderByDescending(p => p.FechaCreacion)
+                .ToListAsync();
+        }
     }
 }

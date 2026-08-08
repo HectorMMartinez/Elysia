@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36518.9 d17.14
+VisualStudioVersion = 17.14.36518.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
@@ -30,6 +30,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elysia.Integration.Tests", "Elysia.Integration.Tests\Elysia.Integration.Tests.csproj", "{CF9516FD-A344-44FC-ACB5-A48CEB85520D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elysia.unit.Tests", "Elysia.unit.Tests\Elysia.unit.Tests.csproj", "{5598B2B8-C427-4FE2-A356-0E3A83E094FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elysia.Infraestructure.CenterIA", "Elysia.Infraestructure.CenterIA\Elysia.Infraestructure.CenterIA.csproj", "{28C60FD9-CD59-4D0A-A54D-96A6B040B688}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +71,10 @@ Global
 		{5598B2B8-C427-4FE2-A356-0E3A83E094FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5598B2B8-C427-4FE2-A356-0E3A83E094FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5598B2B8-C427-4FE2-A356-0E3A83E094FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28C60FD9-CD59-4D0A-A54D-96A6B040B688}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28C60FD9-CD59-4D0A-A54D-96A6B040B688}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28C60FD9-CD59-4D0A-A54D-96A6B040B688}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28C60FD9-CD59-4D0A-A54D-96A6B040B688}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -87,6 +93,7 @@ Global
 		{E82443EC-0CD5-436E-B547-F5A1EF79A904} = {321254A0-AB2B-446E-8B11-6A5E7EA8C252}
 		{CF9516FD-A344-44FC-ACB5-A48CEB85520D} = {361C5EE7-370B-408C-A18B-50D219A26C15}
 		{5598B2B8-C427-4FE2-A356-0E3A83E094FD} = {361C5EE7-370B-408C-A18B-50D219A26C15}
+		{28C60FD9-CD59-4D0A-A54D-96A6B040B688} = {F0C10A90-F736-4401-8CE3-FCB74048BE46}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C74C4F15-05FA-43FA-89D0-5F110BE95586}

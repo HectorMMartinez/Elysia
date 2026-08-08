@@ -1,4 +1,5 @@
 ﻿using Elysia.Core.Domain.interfaces;
+using Elysia.Core.Domain.Settings;
 using Elysia.Infraestructure.persistences.Contexts;
 using Elysia.Infraestructure.persistences.Repositories;
 using Elysia.Infraestructure.persistences.seeds;
@@ -45,6 +46,7 @@ namespace Elysia.Infraestructure.persistences
 
             }
 
+           
 
 
             #region repositories IOC
