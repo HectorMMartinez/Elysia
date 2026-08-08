@@ -18,7 +18,7 @@ namespace Elysia.Core.Application.Dtos.plato
 
         [Range(1, int.MaxValue, ErrorMessage = "Debes ingresar un precio valido")]
         public decimal Precio { get; set; }
-        [Required(ErrorMessage = "Debes ingresar una imagen valida")]
+  
         public IFormFile? Imagen { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Debes ingresar una categoria de plato valida")]
         public int CategoriaId { get; set; }

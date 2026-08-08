@@ -100,10 +100,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> EditarProducto(
-    int id,
-    [FromForm] EditarProductoRequestDto? dto
-)
+        public async Task<ActionResult> EditarProducto(int id,[FromForm] EditarProductoRequestDto? dto)
         {
             try
             {
@@ -229,15 +226,17 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
                     return  BadRequest("No se pudo encontrar el producto especificado");
                 }
                 var response = await service.DeleteAsync(id);
-                var imageDeleted = FileHandler.DeleteImage(producto.Imagen);
-                if (!imageDeleted)
+                if(producto.Imagen != null)
                 {
-                    return BadRequest("No se pudo eliminar la imagen del producto");
+                    var imageDeleted = FileHandler.DeleteImage(producto.Imagen);
+                    if (!imageDeleted)
+                    {
+                        return BadRequest("No se pudo eliminar la imagen del producto");
+                    }
                 }
+                
 
-            
-
-                return NoContent();
+               return NoContent();
             }
             catch (Exception ex)
             {

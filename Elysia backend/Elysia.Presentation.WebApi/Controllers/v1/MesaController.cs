@@ -242,7 +242,16 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
 
 
                 var data = await service.DeleteAsync(id);
-                FileHandler.DeleteImage(mesa.Imagen);
+                if (mesa.Imagen != null)
+                {
+                    bool mesa_deleted =  FileHandler.DeleteImage(mesa.Imagen);
+                    if (!mesa_deleted)
+                    {
+                            return StatusCode(StatusCodes.Status500InternalServerError, "No se pudo eliminar la imagen de la mesa");
+                    }
+                }
+
+
                 return Ok("Mesa eliminada correctamente");
             }
             catch (Exception ex)
