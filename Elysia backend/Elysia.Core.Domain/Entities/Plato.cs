@@ -20,7 +20,7 @@ namespace Elysia.Core.Domain.Entities
         public PlatoEstado Estado { get; set; }
         
         //property navigation
-        public CategoriaPlato Categoria { get; set; } = new CategoriaPlato(); //inicializar
+        public CategoriaPlato? Categoria { get; set; } = null; //inicializar
         public ICollection<PlatoMenu> PlatoMenus { get; set; } = new List<PlatoMenu>();
         public ICollection<DetallesPedido> DetallesPedidos { get; set; } = new List<DetallesPedido>();
         public ICollection<PlatoProducto> PlatoProductos { get; set; } = new List<PlatoProducto>();

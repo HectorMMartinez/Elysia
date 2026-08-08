@@ -79,6 +79,7 @@ namespace Elysia.Core.Application.Services
                     listPlatoProductos.Add(new PlatoProducto() { Cantidad = item.Cantidad, ProductoId = item.Id, PlatoId = plato!.Id });
 
                 }
+
                 await platoProductoRepository.AddRangeAsync(listPlatoProductos);
                 var map = _mapper.Map<PlatoResponseDto>(plato);
                 map.ProductoQuantityDtos = dto.ProductoQuantityDtos;

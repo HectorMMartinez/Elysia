@@ -110,6 +110,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
                 var map = _mapper.Map<CreatePlatoDto>(dto);
                 map.Fecha = DateOnly.FromDateTime(DateTime.Now);
                 map.IdPropietario = id;
+                map.CategoriaId = dto.CategoriaId;
                 map.Imagen = FileHandler.Upload(dto.Imagen, id, "Platos", false);
                 map.Codigo = $"PLA-{GetCode()}";
                 var data = await platoService.AddAsync(map);
@@ -197,7 +198,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
 
                 if(!string.IsNullOrWhiteSpace(plato.Imagen))
                 {
-                    bool image_deleted =  FileHandler.Delete(user_id,plato.Imagen);
+                    bool image_deleted =  FileHandler.DeleteImage(plato.Imagen);
                     if(!image_deleted)
                     {
                         return StatusCode(StatusCodes.Status500InternalServerError, "No se pudo eliminar la imagen del plato");
