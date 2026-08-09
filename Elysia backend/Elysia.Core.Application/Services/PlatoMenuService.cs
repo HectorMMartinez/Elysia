@@ -117,7 +117,8 @@ namespace Elysia.Core.Application.Services
                         MenuId = menu.Id,
                         NombreMenu = menu.Nombre,
                         DescripcionMenu = menu.Descripcion,
-                        MenuEstado = menu.Estado
+                        MenuEstado = menu.Estado,
+                        IsPrincipal = menu.IsPrincipal,
                     };
 
                     foreach (var menuPlato in menu.PlatoMenus)

@@ -18,6 +18,7 @@ namespace Elysia.Core.Application.Dtos.platoMenu
         public string NombreMenu { get; set; }= string.Empty;
         public string DescripcionMenu { get; set; }= string.Empty;  
         public MenuEstado MenuEstado { get; set; }
+        public bool IsPrincipal { get; set; }   
         public List<CreatePlatoDto> Platos { get; set; } = new List<CreatePlatoDto>();
 
 
