@@ -51,6 +51,10 @@ const ENDPOINTS = {
     // si ya tienes GET_ALL, solo agrega esta línea
     CAMBIAR_PLAN: "/Plans/cambiar-plan-usuario",
   },
+  
+  DASHBOARD_ADMIN: {
+    GET_PANEL: "/DashboardAdmin/get-panel-admin",
+  },
 
 };
 
