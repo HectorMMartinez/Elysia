@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   FaAngleLeft,
@@ -14,64 +14,112 @@ import {
   FaClipboardList,
   FaUserCircle,
   FaClock,
+  FaChartBar,
+  FaLock,
 } from "react-icons/fa";
 
 import { storage } from "../../utils/storage";
+import dashboardService from "../../services/dashboardPropietarioService";
 
 export default function OwnerSidebar({ children }) {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+  const [planId, setPlanId] = useState(null);
+
+  useEffect(() => {
+    const cargarPlan = async () => {
+      // Primero intentamos leer del storage
+      const auth = storage.getAuth();
+      if (auth?.planId) {
+        setPlanId(auth.planId);
+        return;
+      }
+
+      // Si no está, lo pedimos al backend
+      const res = await dashboardService.getPanel();
+      if (res.success) {
+        setPlanId(res.data.planId);
+
+        if (auth) {
+          storage.saveAuth({
+            ...auth,
+            planId: res.data.planId,
+          });
+        }
+      }
+    };
+
+    cargarPlan();
+  }, []);
+
+  const esPremium = planId === 2;
 
   const menuItems = [
     {
       label: "Dashboard",
       path: "/dashboard",
       icon: FaChartLine,
+      premiumOnly: false,
     },
     {
       label: "Inventario",
       path: "/inventario",
       icon: FaBoxOpen,
+      premiumOnly: false,
     },
     {
       label: "Platos",
       path: "/platos",
       icon: FaUtensils,
+      premiumOnly: false,
     },
     {
       label: "Menu",
       path: "/menu",
       icon: FaClipboardList,
+      premiumOnly: false,
     },
     {
       label: "Mesas",
       path: "/mesas",
       icon: FaChair,
+      premiumOnly: false,
     },
     {
       label: "Reservas",
       path: "/reservas",
       icon: FaCalendarCheck,
+      premiumOnly: false,
     },
     {
       label: "Pedidos",
       path: "/pedidos",
       icon: FaDollarSign,
-    },
-    {
-      label: "Empleados",
-      path: "/empleados",
-      icon: FaUsers,
+      premiumOnly: false,
     },
     {
       label: "Turnos",
       path: "/turnos",
       icon: FaClock,
+      premiumOnly: true,
+    },
+    {
+      label: "Empleados",
+      path: "/empleados",
+      icon: FaUsers,
+      premiumOnly: true,
+    },
+    {
+      label: "Central de Inteligencia",
+      path: "/central-inteligencia",
+      icon: FaChartBar,
+      premiumOnly: true,
     },
     {
       label: "Perfil",
       path: "/perfil",
       icon: FaUserCircle,
+      premiumOnly: false,
     },
   ];
 
@@ -79,6 +127,11 @@ export default function OwnerSidebar({ children }) {
     storage.clearAuth();
     navigate("/", { replace: true });
   };
+
+  const menuVisible = menuItems.filter((item) => {
+    if (item.premiumOnly && !esPremium) return false;
+    return true;
+  });
 
   return (
     <div className="flex min-h-screen bg-slate-50">
@@ -88,11 +141,7 @@ export default function OwnerSidebar({ children }) {
           collapsed ? "w-20" : "w-72"
         }`}
       >
-        <div
-          className={`border-b border-slate-700 ${
-            collapsed ? "p-4" : "p-8"
-          }`}
-        >
+        <div className={`border-b border-slate-700 ${collapsed ? "p-4" : "p-8"}`}>
           <div
             className={`flex items-center ${
               collapsed ? "justify-center" : "justify-between gap-4"
@@ -101,12 +150,9 @@ export default function OwnerSidebar({ children }) {
             {!collapsed && (
               <div>
                 <h1 className="text-3xl font-bold">Elysia</h1>
-                <p className="mt-2 text-slate-400">
-                  Restaurant Management
-                </p>
+                <p className="mt-2 text-slate-400">Restaurant Management</p>
               </div>
             )}
-
             <button
               type="button"
               onClick={() => setCollapsed((actual) => !actual)}
@@ -120,9 +166,8 @@ export default function OwnerSidebar({ children }) {
         </div>
 
         <nav className="flex-1 space-y-2 p-4">
-          {menuItems.map((item) => {
+          {menuVisible.map((item) => {
             const Icon = item.icon;
-
             return (
               <NavLink
                 key={item.path}
@@ -145,6 +190,19 @@ export default function OwnerSidebar({ children }) {
               </NavLink>
             );
           })}
+
+          {!esPremium && !collapsed && (
+            <div className="mt-6 rounded-xl bg-amber-500/10 border border-amber-500/30 p-4">
+              <div className="flex items-center gap-2 text-amber-400 text-sm font-medium mb-1">
+                <FaLock size={14} />
+                <span>Plan Simple</span>
+              </div>
+              <p className="text-xs text-slate-400">
+                Mejora a Premium para acceder a Turnos, Empleados y Central de
+                Inteligencia.
+              </p>
+            </div>
+          )}
         </nav>
 
         <div className="border-t border-slate-700 p-4">

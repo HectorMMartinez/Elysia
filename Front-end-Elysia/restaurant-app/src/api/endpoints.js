@@ -33,6 +33,7 @@ const ENDPOINTS = {
     GET_ALL: "/CategoriaPlato/get-all-categoriaPlatos",
   },
 
+
   MESA: {
     GET_ALL: "/Mesa/get-all",
     GET_ALL_DISPONIBLES: "/Mesa/get-all-disponibles",
@@ -40,7 +41,17 @@ const ENDPOINTS = {
     CREATE: "/Mesa/add-mesa",
     UPDATE: (id) => `/Mesa/update-mesa/${id}`,
     DELETE: (id) => `/Mesa/delete-by-id/${id}`,
-  }
+  },
+
+  DASHBOARD: {
+    GET_PANEL: "/DashboardPropietario/get-panel-propietario",
+  },
+
+  PLAN: {
+    // si ya tienes GET_ALL, solo agrega esta línea
+    CAMBIAR_PLAN: "/Plans/cambiar-plan-usuario",
+  },
+
 };
 
 export default ENDPOINTS;
