@@ -541,6 +541,7 @@ namespace Elysia.Infraestructure.Identity.Services
                 response.LastName = user.LastName;
                 response.Email = user.Email ?? "";
                 response.IsActive = user.EmailConfirmed;
+                response.ProfileImage = !string.IsNullOrEmpty(saveUser.ProfileImage) ? saveUser.ProfileImage : user.ProfileImage;
                 response.Roles = CurrentrolesList.ToList();
 
                 return response;
@@ -781,6 +782,62 @@ namespace Elysia.Infraestructure.Identity.Services
 
             List<UserDto> ListUserDto = [];
             var ListUser = await users.ToListAsync();
+
+
+            foreach (var item in ListUser)
+            {
+
+                var rolesList = await userManager.GetRolesAsync(item);
+
+
+                ListUserDto.Add(new UserDto()
+                {
+
+                    Id = item.Id,
+                    Name = item.Name,
+                    UserName = item.UserName ?? "",
+                    LastName = item.LastName,
+                    Email = item.Email ?? "",
+                    IsActive = item.EmailConfirmed,
+                    NombreRestaurante = item.NombreRestaurante ?? "",
+                    RNC = item.RNC ?? "",
+                    LogoRestaurante = item.LogoRestaurante ?? "",
+                    DireccionRestaurante = item.DireccionRestaurante ?? "",
+                    HoraApertura = item.HoraApertura ?? new TimeOnly(0, 0),
+                    HoraCierre = item.HoraCierre ?? new TimeOnly(0, 0),
+                    PhoneRestaurante = item.PhoneRestaurante ?? "",
+                    IdCard = item.IdCard ?? "",
+                    Phone = item.PhoneNumber ?? "",
+                    ProfileImage = item.ProfileImage,
+                    Role = rolesList.FirstOrDefault() ?? ""
+
+                });
+
+
+
+            }
+
+            return ListUserDto.Where(c => c.Role == UserRoles.Admin.ToString()).ToList();
+
+
+        }
+
+
+
+        public async Task<List<UserDto>> GetAllUserAdminExceptoAdminId(string adminId)
+        {
+
+            var users = userManager.Users;
+
+
+            if (users == null)
+            {
+                return new List<UserDto>();
+            }
+
+
+            List<UserDto> ListUserDto = [];
+            var ListUser = await users.Where(x => x.Id != adminId).ToListAsync();
 
 
             foreach (var item in ListUser)

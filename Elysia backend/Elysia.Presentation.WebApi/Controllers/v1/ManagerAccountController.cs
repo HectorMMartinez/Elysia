@@ -64,7 +64,9 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         {
             try
             {
-                var data = await accountServices.GetAllUserAdmin();
+                var user_id = User.FindFirst("UId")!.Value; 
+
+                var data = await accountServices.GetAllUserAdminExceptoAdminId(user_id);
                 if (data == null || data.Count == 0)
                 {
                     return NotFound("No existen usuario con el rol admin registrados");
@@ -275,7 +277,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status404NotFound)]   
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async  Task<IActionResult> EditarPerfil(EditPerfilUserDto? perfilDto)
+        public async  Task<IActionResult> EditarPerfil([FromForm] EditPerfilUserDto? perfilDto)
         {
             try
             {
@@ -305,7 +307,8 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
                 map.Id = user_id;
                 map.Role = user_exist.Role;
                 var data = await accountServices.EditUser(map);
-                if (data != null || data.HasError)
+                
+                if (data == null || data.HasError)
                 {
                     return NotFound(data.Errors.FirstOrDefault());
                 

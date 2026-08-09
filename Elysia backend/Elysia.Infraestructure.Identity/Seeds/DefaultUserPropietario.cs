@@ -35,6 +35,8 @@ namespace Elysia.Infraestructure.Identity.Seeds
                 HoraCierre = new TimeOnly(22, 0),
                 DireccionRestaurante = "Calle Principal #123",
                 PhoneRestaurante = "8095551234",
+                PhoneNumber = "8095551234",
+                PhoneNumberConfirmed = true,
                 Especialidad = "Comida Dominicana",
                 EmailConfirmed = true
             };
@@ -64,7 +66,7 @@ namespace Elysia.Infraestructure.Identity.Seeds
                 {
                     UsuarioId = user_exist!.Id,
                     NumeroTarjeta = "1234567890123456",
-                    AnioVencimiento = 2030,
+                    AnioVencimiento = 2030 % 100,
                     MesVencimiento = 12,
                     FechaRegistro = DateTime.Now,   
                     NombreTitular = "Propietario Dev",
