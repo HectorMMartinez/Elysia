@@ -44,7 +44,7 @@ namespace Elysia.Core.Application
             services.AddScoped<IShiftEmpleadoService, ShiftEmpleadoService>();
             services.AddScoped<ICenterIAService, CenterIAService>();
             services.AddScoped<IDashboardPropietarioServices, DashboardPropietarioServices>();
-
+            services.AddScoped<IDashboardAdminService, DashboardAdminService>();
 
             #endregion
 
