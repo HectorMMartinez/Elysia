@@ -209,7 +209,7 @@ namespace Elysia.Core.Application.Services
 
 
                 var data = await tarjetaRepository.GetlAllAsync();
-                if (data.Any() && data.Any(x => x.CVV == dto.CVV))
+                if (data.Any() && data.Any(x => x.CVV == dto.CVV && x.Id != id))
                 {
                     response.HasError = true;
                     response.Errors.Add("CVV invalido, favor verificar y volver al intentar");
@@ -227,7 +227,7 @@ namespace Elysia.Core.Application.Services
                 }
 
 
-                if (data.Any() && data.Any(x => x.NumeroTarjeta == dto.NumeroTarjeta))
+                if (data.Any() && data.Any(x => x.NumeroTarjeta == dto.NumeroTarjeta && x.Id != id))
                 {
                     response.HasError = true;
                     response.Errors.Add($"El numero de tarjeta es invalido favor verificar y volver a intentar");
@@ -361,8 +361,8 @@ namespace Elysia.Core.Application.Services
                         Id = item.Id,
                         UsuarioId = item.UsuarioId,
                         AnioVencimiento = item.AnioVencimiento,
-                        DireccionRestaurante = restaurante.DireccionRestaurante,
-                        NombreRestaurante = restaurante.NombreRestaurante,
+                        DireccionRestaurante = restaurante != null ? restaurante.DireccionRestaurante : "Calle xxx #000",
+                        NombreRestaurante = restaurante != null ?  restaurante.NombreRestaurante : "Restaurante Desconocido",
                         CVV = item.CVV,
                         FechaRegistro = item.FechaRegistro,
                         MesVencimiento = item.MesVencimiento,

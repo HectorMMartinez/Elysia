@@ -89,16 +89,18 @@ namespace Elysia.Core.Application.Services
                         var plan = await planRepository.GetByIdAsync(item.PlanId);
                         var user = await accountServices.GetUserById(item.UsuarioId);
 
-                        var membresia = new MostrarMembresiaConPropietarioDto() 
-                                        { Id = item.Id,
-                                          UserName = user.UserName,
-                                          NombrePlan = plan.Nombre,
-                                          UsuarioId = item.UsuarioId, 
-                                          PlanId = item.PlanId, 
-                                          NombreRestaurante = user.NombreRestaurante,
-                                          FechaFin = item.FechaFin,
-                                          FechaInicio = item.FechaInicio,
-                                          Estado = item.Estado };
+                        var membresia = new MostrarMembresiaConPropietarioDto()
+                        {
+                            Id = item.Id,
+                            UserName = user != null? user.UserName : "Usuario Desconocido",
+                            NombrePlan = plan != null ? plan.Nombre : "Plan Desconocido",
+                            UsuarioId = item.UsuarioId,
+                            PlanId = item.PlanId,
+                            NombreRestaurante =  user != null ?  user.NombreRestaurante : "Restaurante Desconocido",
+                            FechaFin = item.FechaFin,
+                            FechaInicio = item.FechaInicio,
+                            Estado = item.Estado
+                        }; 
 
                         listMembresia.Add(membresia);   
                     }

@@ -19,5 +19,6 @@ namespace Elysia.Core.Application.Interfaces
         Task<UserResponseDto?> RessetPassowrd(RessetPasswordRequestDto? request);
         Task<List<UserDto>> GetAllUserPropietario();
         Task<List<UserDto>> GetAllUserAdmin();
+        Task<List<UserDto>> GetAllUserAdminExceptoAdminId(string adminId);
     }
 }

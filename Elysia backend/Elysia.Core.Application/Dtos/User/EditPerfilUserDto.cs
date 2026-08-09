@@ -15,15 +15,16 @@ namespace Elysia.Core.Application.Dtos.User
         [Required(ErrorMessage = "Debes ingresar el apellido")]
         public required string LastName { get; set; }
   
-        public required string Email { get; set; }
+        public  string? Email { get; set; }
+
         [Required(ErrorMessage = "Debes ingresar el nombre de usuario")]
         public required string UserName { get; set; }
 
 
         //opcional al editar
-        public required string Password { get; set; }
+        public  string? Password { get; set; }
         //opcional al editar
-        public required string? Phone { get; set; } //del usuario
+        public  string? Phone { get; set; } //del usuario
 
         //opcional al editar
         public IFormFile? ProfileImage { get; set; } //del usuario

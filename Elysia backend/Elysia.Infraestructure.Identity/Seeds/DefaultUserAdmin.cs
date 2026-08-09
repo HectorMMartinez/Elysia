@@ -25,10 +25,13 @@ namespace Elysia.Infraestructure.Identity.Seeds
             {
                 Name = "Admin",
                 LastName = "Dev",
-                UserName = "Admin-dev", // sin espacios
+                UserName = "Admin-dev user", // sin espacios
                 Email = email,
                 ProfileImage = "https://i.pravatar.cc/150?img=33",
                 IsActive = true,
+                PhoneNumber = "8095555555",
+                PhoneNumberConfirmed = true,
+                IdCard = "12345678901",
                 EmailConfirmed = true
             };
 
