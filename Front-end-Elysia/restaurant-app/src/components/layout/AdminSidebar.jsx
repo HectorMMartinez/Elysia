@@ -31,7 +31,7 @@ export default function AdminSidebar() {
     },
     {
       label: "Admins",
-      path: "/admin/admins",
+      path: "/admin/administradores",
       icon: FaUserShield,
     },
     {
