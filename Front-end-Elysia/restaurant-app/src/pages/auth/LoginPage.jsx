@@ -31,18 +31,38 @@ export default function LoginPage() {
     message: location.state?.message || ""
   });
 
-  const onSubmit = async (data) => {
+const onSubmit = async (data) => {
   setLoading(true);
 
   try {
-   
+    const res = await authService.login(data);
 
-    const res = await authService.login(data); 
-   
     if (res.success) {
-      login(res.data); 
-      navigate("/dashboard"); 
-     
+      login(res.data);
+
+      const role = res.data.rol;
+
+      switch (role) {
+        case "Admin":
+          navigate("/admin/dashboard");
+          break;
+
+        case "Propietario":
+          navigate("/dashboard");
+          break;
+
+        case "Empleado":
+          navigate("/empleado/dashboard");
+          break;
+
+        default:
+          setAlert({
+            show: true,
+            type: "error",
+            message: "El usuario no tiene un rol válido."
+          });
+          break;
+      }
     } else {
       setAlert({
         show: true,
@@ -50,9 +70,7 @@ export default function LoginPage() {
         message: res.message
       });
     }
-
   } catch (error) {
-
     setAlert({
       show: true,
       type: "error",
