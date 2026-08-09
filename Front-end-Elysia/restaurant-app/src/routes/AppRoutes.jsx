@@ -8,9 +8,9 @@ import ConfirmAccountPage from "../pages/auth/ConfirmAccountPage";
 import OwnerDashboardPage from "../pages/dashboard/OwnerDashboardPage";
 import InventoryPage from "../pages/inventory/InventoryPage";
 import PlatosPage from "../pages/dishes/PlatosPage";
+import { TablesPage } from "../pages/tables/TablesPage";
 
 import PrivateRoute from "./PrivateRoute";
-
 
 export default function AppRoutes() {
   return (
@@ -49,6 +49,15 @@ export default function AppRoutes() {
           element={
             <PrivateRoute>
               <PlatosPage />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/mesas"
+          element={
+            <PrivateRoute>
+              <TablesPage />
             </PrivateRoute>
           }
         />
