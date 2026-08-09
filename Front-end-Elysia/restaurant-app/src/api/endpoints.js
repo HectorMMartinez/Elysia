@@ -51,10 +51,37 @@ const ENDPOINTS = {
     // si ya tienes GET_ALL, solo agrega esta línea
     CAMBIAR_PLAN: "/Plans/cambiar-plan-usuario",
   },
-  
+
   DASHBOARD_ADMIN: {
     GET_PANEL: "/DashboardAdmin/get-panel-admin",
   },
+
+  MANAGER_ACCOUNT: {
+  GET_ALL_PROPIETARIOS: "/ManagerAccount/get-all-user-propietario",
+  GET_ALL_ADMINS: "/ManagerAccount/get-all-user-admin",
+  GET_BY_ID: (id) => `/ManagerAccount/get-user-by-id/${id}`,
+  ACTIVAR: (id) => `/ManagerAccount/activar-user-by-id/${id}`,
+  INACTIVAR: (id) => `/ManagerAccount/inactivar-user-by-id/${id}`,
+  GET_PERFIL: "/ManagerAccount/get-perfil-usuario",
+  EDITAR_PERFIL: "/ManagerAccount/edit-perfil",
+  },
+
+
+  MEMBRESIA: {
+  GET_ALL: "/Membresia/get-all-membresia",
+  CANCELAR: (id) =>
+    `/Membresia/cancelar-membresia/${id}`,
+  SUSPENDER: (id) =>
+    `/Membresia/suspender-membresia/${id}`,
+  ACTIVAR_POR_UN_MES: (id) =>
+    `/Membresia/activar-membresia-por-un-mes/${id}`,
+   },
+
+   MANAGER_TARJETA: {
+    GET_ALL: "/ManagerTarjeta/get-all-tarjeta",
+    GET_BY_ID: (id) => `/ManagerTarjeta/get-tarjeta-by-id/${id}`,
+    EDITAR: (id) => `/ManagerTarjeta/editar-tarjeta/${id}`,
+   },
 
 };
 

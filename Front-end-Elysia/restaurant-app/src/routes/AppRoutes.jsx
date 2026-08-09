@@ -22,11 +22,12 @@ import { TablesPage } from "../pages/tables/TablesPage";
 
 // Admin
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
-// import PropietariosPage from "../pages/admin/PropietariosPage";
-// import AdminsPage from "../pages/admin/AdminsPage";
-// import MembresiasPage from "../pages/admin/MembresiasPage";
-// import TarjetasPage from "../pages/admin/TarjetasPage";
-// import AdminPerfilPage from "../pages/admin/AdminPerfilPage";
+import PropietariosPage from "../pages/admin/AdminPropietariosPage";
+import AdminAdministradoresPage from "../pages/admin/AdminAdministradoresPage";
+import MembresiasPage from "../pages/admin/MembresiasPage";
+import TarjetasPage from "../pages/admin/TarjetasPage";
+import PerfilPage from "../pages/admin/PerfilPage";
+
 
 import PrivateRoute from "./PrivateRoute";
 
@@ -99,14 +100,47 @@ export default function AppRoutes() {
           }
         />
 
-        {/* Descomenta cuando tengas las páginas listas */}
-        {/* 
-        <Route path="/admin/propietarios" element={<PrivateRoute><PropietariosPage /></PrivateRoute>} />
-        <Route path="/admin/admins" element={<PrivateRoute><AdminsPage /></PrivateRoute>} />
-        <Route path="/admin/membresias" element={<PrivateRoute><MembresiasPage /></PrivateRoute>} />
-        <Route path="/admin/tarjetas" element={<PrivateRoute><TarjetasPage /></PrivateRoute>} />
-        <Route path="/admin/perfil" element={<PrivateRoute><AdminPerfilPage /></PrivateRoute>} />
-        */}
+     <Route
+      path="/admin/propietarios"
+      element={
+       <PrivateRoute>
+         <PropietariosPage />
+       </PrivateRoute>
+      }/>
+
+      <Route
+       path="/admin/administradores"
+       element={
+       <PrivateRoute>
+         <AdminAdministradoresPage />
+       </PrivateRoute>
+      } 
+      />
+
+      <Route
+       path="/admin/membresias"
+       element={
+       <PrivateRoute>
+        <MembresiasPage />
+      </PrivateRoute>
+      }/>
+
+      <Route
+       path="/admin/tarjetas"
+       element={
+       <PrivateRoute>
+        <TarjetasPage />
+      </PrivateRoute>
+      }/>
+
+       <Route
+       path="/admin/perfil"
+       element={
+       <PrivateRoute>
+        <PerfilPage/>
+      </PrivateRoute>
+      }/>
+      
       </Routes>
     </BrowserRouter>
   );
