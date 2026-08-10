@@ -38,7 +38,7 @@ namespace Elysia.Infraestructure.persistences.Repositories
 
         public async Task<List<Mesa>> GetAllDisponibleByPropietarioId(string propietarioId)
         {
-            var mesasDisponibles = await context.Set<Mesa>().Where(x => x.IdPropietario == propietarioId && x.Estado == MesaEstado.Disponible || x.Estado == MesaEstado.Reservada).ToListAsync();
+            var mesasDisponibles = await context.Set<Mesa>().Where(x => x.IdPropietario == propietarioId && (x.Estado == MesaEstado.Disponible || x.Estado == MesaEstado.Reservada)).ToListAsync();
 
             if (mesasDisponibles.Any())
             {
