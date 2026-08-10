@@ -22,11 +22,11 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
 
         public ReservaController(IMapper _mapper, UserManager<AppUser> userManager, IReservaServices reservaServices)
         {
-           this._mapper = _mapper;
-           this.reservaServices = reservaServices;
-           this.userManager = userManager;   
-        
-        
+            this._mapper = _mapper;
+            this.reservaServices = reservaServices;
+            this.userManager = userManager;
+
+
         }
 
 
@@ -35,7 +35,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ReservaResponseDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async  Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll()
         {
             try
             {
@@ -60,7 +60,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         }
 
 
-        
+
         [HttpPost("add-reserva")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ReservaResponseDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -69,27 +69,32 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         {
             try
             {
-                if(dto == null)
+                if (dto == null)
                 {
                     return BadRequest("Debes indicar los valores correctamente para agregar la reserva");
                 }
 
                 var horaReserva = dto.FechaReserva.Hour;
-           
+
                 var user_id = User.FindFirst("UId")!.Value;
                 var user = await userManager.FindByIdAsync(user_id);
                 var horaCierre = user.HoraCierre.Value.ToTimeSpan();
-                if (horaReserva > horaCierre.Hours)
+                var horaApertura = user.HoraApertura.Value.ToTimeSpan();
+                if (horaReserva > horaCierre.Hours || horaReserva < horaApertura.Hours)
                 {
-                    return BadRequest("La hora de la reserva no es valida, el restaurante cierra antes");
+                    return BadRequest("La hora de la reserva no es valida, puede que el restaurante ya este cerrado o no este abierto");
                 }
 
-                var map = _mapper.Map<CreateReservaDto>(dto); 
+                var map = _mapper.Map<CreateReservaDto>(dto);
                 map.FechaActualizacion = DateTime.Now;
-                map.FechaCreacion = map.FechaActualizacion;   
+                map.FechaCreacion = map.FechaActualizacion;
                 map.IdPropietario = user_id;
                 map.Estado = EstadoReserva.Activa;
-                var data = await reservaServices.AddAsync(map); 
+                var data = await reservaServices.AddAsync(map);
+                if(data == null || data.HasError)
+                {
+                    return BadRequest(data.Errors.FirstOrDefault());
+                }
                 return Ok(data);
 
             }
@@ -108,7 +113,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ReservaResponseDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateReservaAsync(int id,[FromBody] EditarReservaRequestDto? dto)
+        public async Task<IActionResult> UpdateReservaAsync(int id, [FromBody] EditarReservaRequestDto? dto)
         {
             try
             {
@@ -123,15 +128,25 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
                 var user_id = User.FindFirst("UId")!.Value;
                 var user = await userManager.FindByIdAsync(user_id);
                 var horaCierre = user.HoraCierre.Value.ToTimeSpan();
-                if (horaReserva > horaCierre.Hours)
+                var horaApertura = user.HoraApertura.Value.ToTimeSpan();
+                if (horaReserva > horaCierre.Hours || horaReserva < horaApertura.Hours)
                 {
-                    return BadRequest("La hora de la reserva no es valida, el restaurante cierra antes");
+                    return BadRequest("La hora de la reserva no es valida, puede que el restaurante ya este cerrado o no este abierto");
                 }
+
 
                 var map = _mapper.Map<EditarReservaDto>(dto);
                 map.FechaActualizacion = DateTime.Now;
-                
-                var data = await reservaServices.UpdateAsync(id,map);
+                var reserva_Exist = await reservaServices.GetByIdAsync(id);
+                if (reserva_Exist != null) 
+                {
+                   map.FechaCreacion = reserva_Exist.FechaCreacion; 
+                }
+                var data = await reservaServices.UpdateAsync(id, map);
+                if (data == null || data.HasError)
+                {
+                    return BadRequest(data.Errors.FirstOrDefault());
+                }
                 return Ok(data);
 
             }
@@ -160,9 +175,9 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
                     return BadRequest("Debes indicar el id correctamente");
                 }
 
-            
+
                 var data = await reservaServices.GetByIdAsync(id);
-                if(data == null)
+                if (data == null)
                 {
                     return NotFound("No se encontro una reserva con ese id");
                 }
