@@ -13,7 +13,7 @@ import InventoryPage from "../pages/inventory/InventoryPage";
 import PlatosPage from "../pages/dishes/PlatosPage";
 import { TablesPage } from "../pages/tables/TablesPage";
 // import MenuPage from "../pages/menu/MenuPage";
-// import ReservasPage from "../pages/reservas/ReservasPage";
+import ReservasPage from "../pages/reservas/ReservasPage";
 // import PedidosPage from "../pages/pedidos/PedidosPage";
 // import TurnosPage from "../pages/turnos/TurnosPage";
 // import EmpleadosPage from "../pages/empleados/EmpleadosPage";
@@ -79,6 +79,16 @@ export default function AppRoutes() {
           }
         />
 
+
+          <Route
+          path="/reservas"
+          element={
+            <PrivateRoute>
+              <ReservasPage/>
+            </PrivateRoute>
+          }
+        />
+
         {/* Descomenta cuando tengas las páginas listas */}
         {/* 
         <Route path="/menu" element={<PrivateRoute><MenuPage /></PrivateRoute>} />
@@ -140,7 +150,7 @@ export default function AppRoutes() {
         <PerfilPage/>
       </PrivateRoute>
       }/>
-      
+
       </Routes>
     </BrowserRouter>
   );
