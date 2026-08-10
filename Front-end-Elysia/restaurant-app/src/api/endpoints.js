@@ -83,6 +83,18 @@ const ENDPOINTS = {
     EDITAR: (id) => `/ManagerTarjeta/editar-tarjeta/${id}`,
    },
 
+  RESERVA: {
+  GET_ALL: "/Reserva/get-all-reservas",
+  GET_BY_ID: (id) => `/Reserva/get-by-id/${id}`,
+  CREATE: "/Reserva/add-reserva",
+  UPDATE: (id) => `/Reserva/update-reserva/${id}`,
+  DELETE: (id) => `/Reserva/delete-by-id/${id}`,
+  CAMBIAR_EN_PROCESO: (id) => `/Reserva/cambiar-reserva-en-Proceso/${id}`,
+  CAMBIAR_NO_ASISTIO: (id) => `/Reserva/cambiar-reserva-no-asistio/${id}`,
+  FINALIZAR: (id) => `/Reserva/finalizar-reserva/${id}`,
+  CANCELAR: (id) => `/Reserva/cancelar-reserva/${id}`,
+},
+
 };
 
 export default ENDPOINTS;
