@@ -108,6 +108,7 @@ PEDIDO: {
   CANCELAR: (id) => `/Pedido/cancelar-pedido/${id}`,
   FINALIZAR: (id) => `/Pedido/finalizar-pedido/${id}`,
 },
+
 EMPLEADO: {
   GET_ALL: "/Empleado/Get-all-empleados",
   GET_ALL_ACTIVOS: "/Empleado/Get-all-empleados-activos",
@@ -121,6 +122,18 @@ EMPLEADO: {
 
 PUESTO: {
   GET_ALL: "/Puesto/get-all-puesto",
+},
+
+
+SHIFT: {
+  GET_ALL: "/Shift/Get-all-turnos-by-restaurante",
+  GET_BY_ID: (id) => `/Shift/Get-by-id/${id}`,
+  CREATE: "/Shift/add-turno",
+  UPDATE: (id) => `/Shift/edit-turno/${id}`,
+  DELETE: (id) => `/Shift/delete-turno/${id}`,
+  GET_ALL_EMPLEADOS_TURNOS: "/Shift/Get-all-turnos-empleados",
+  ASOCIAR_EMPLEADO: "/Shift/asociar-turno-empleado",
+  DESASOCIAR_EMPLEADO: (id) => `/Shift/delete-turno-empleado/${id}`,
 },
 
 };

@@ -15,7 +15,7 @@ import { TablesPage } from "../pages/tables/TablesPage";
 // import MenuPage from "../pages/menu/MenuPage";
 import ReservasPage from "../pages/reservas/ReservasPage";
 import PedidosPage from "../pages/pedido/PedidosPage";
-// import TurnosPage from "../pages/turnos/TurnosPage";
+import TurnosPage from "../pages/shifts/TurnosPage";
 import EmpleadosPage from "../pages/empleado/EmpleadosPage";
 // import CentralInteligenciaPage from "../pages/central/CentralInteligenciaPage";
 import OwnerProfilePage from "../pages/owner/OwnerProfilePage";
@@ -118,6 +118,15 @@ export default function AppRoutes() {
           element={
             <PrivateRoute>
               <EmpleadosPage/>
+            </PrivateRoute>
+          }
+        />
+
+         <Route
+          path="/turnos"
+          element={
+            <PrivateRoute>
+              <TurnosPage/>
             </PrivateRoute>
           }
         />
