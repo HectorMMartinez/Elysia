@@ -612,7 +612,7 @@ namespace Elysia.Core.Application.Services
                         Estado = entity.Estado,
                         FechaCreacion = pedido.FechaCreacion,
                         FechaActualizacion = DateTime.Now,
-                        Total = total
+                        Total = total > 0 ? total : entity.Total
                     });
 
                 var dataDetalles = await detallesPedidoRepository.UpdateRangeAsync(id, listDetalles);
@@ -622,7 +622,7 @@ namespace Elysia.Core.Application.Services
                     Id = dataPedido.Id,
                     IdMesa = dataPedido.IdMesa,
                     NombreMesa = mesa.Nombre,
-                    TotalPedido = total,
+                    TotalPedido = total > 0 ? total : entity.Total,
                     Estado = dataPedido.Estado,
                     FechaCreacion = dataPedido.FechaCreacion,
                     MostrarDetalles = dataDetalles

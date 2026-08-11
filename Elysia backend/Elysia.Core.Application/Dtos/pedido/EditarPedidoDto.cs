@@ -15,6 +15,7 @@ namespace Elysia.Core.Application.Dtos.pedido
         public DateTime FechaCreacion { get; set; }
         public DateTime FechaActualizacion { get; set; }
         public EstadoPedido Estado { get; set; }
+        public decimal Total {  get; set; }
         public List<CreateDetallesPedidoRequestDto> DetallesPedidoDtos { get; set; } = new List<CreateDetallesPedidoRequestDto>();
 
     }

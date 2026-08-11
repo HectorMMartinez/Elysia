@@ -87,6 +87,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
 
                 var pedido = await pedidoService.GetByIdAsync(id);
                 var map = mapper.Map<EditarPedidoDto>(pedido);
+                map.Total = pedido.Total;
                 var updatePedido = await pedidoService.UpdateAsync(pedido.Id,map);
 
                 return Ok("Pedido colocado en preparacion correctamente");
