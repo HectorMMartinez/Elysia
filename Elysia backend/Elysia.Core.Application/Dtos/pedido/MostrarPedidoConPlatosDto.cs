@@ -15,6 +15,7 @@ namespace Elysia.Core.Application.Dtos.pedido
         public string? NombreMesa { get; set; }
         public decimal? TotalPedido {  get; set; }
         public EstadoPedido Estado { get; set; }
+        public DateTime FechaCreacion { get; set; }
         public List<MostrarDetallesPedidoDto> MostrarDetalles { get; set; } = new List<MostrarDetallesPedidoDto>();
         public bool HasError { get; set; }
         public List<string> Errors { get; set; } = new List<string>();

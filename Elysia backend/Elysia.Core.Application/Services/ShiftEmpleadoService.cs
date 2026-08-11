@@ -62,6 +62,19 @@ namespace Elysia.Core.Application.Services
 
                 }
 
+
+               var is_asociado_turno = await repo.GetEmployeeShiftsByEmpleadoId(entity.EmpleadoId);
+                if (is_asociado_turno.Any(x => x.WorkDate == entity.WorkDate && x.ShiftId == entity.ShiftId))
+                {
+                    response.HasError = true;
+                    response.Errors.Add("El empleado ya tiene ese turno asociado, favor revisar");
+                    return response;
+
+
+                }
+
+
+
                 if(entity.WorkDate < DateOnly.FromDateTime(DateTime.Now))
                 {
                     response.HasError = true;
@@ -69,6 +82,7 @@ namespace Elysia.Core.Application.Services
                     return response;
 
                 }
+
 
                 var data = await base.AddAsync(entity);
                 return data;

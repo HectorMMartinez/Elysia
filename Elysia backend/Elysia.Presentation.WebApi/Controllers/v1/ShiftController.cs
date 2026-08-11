@@ -96,7 +96,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         {
             try
             {
-                if(entity == null || entity.StartTime < TimeOnly.FromDateTime(DateTime.Now) || entity.EndTime < TimeOnly.FromDateTime(DateTime.Now))
+                if(entity == null)
                 {
                     return BadRequest("Debes indicar correctamente los datos para agregar el turno");
                 }
@@ -134,7 +134,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         {
             try
             {
-                if (id <= 0 || entity == null || entity.StartTime < TimeOnly.FromDateTime(DateTime.Now) || entity.EndTime < TimeOnly.FromDateTime(DateTime.Now))
+                if (id <= 0 || entity == null)
                 {
                     return BadRequest("Debes indicar correctamente los datos para agregar el turno");
                 }
@@ -231,6 +231,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         }
 
 
+        
         [HttpPost("asociar-turno-empleado")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -272,7 +273,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AsociasarTurnoEmpleado(int id)
+        public async Task<IActionResult> DesaciarTurnoEmpleado(int id)
         {
             try
             {

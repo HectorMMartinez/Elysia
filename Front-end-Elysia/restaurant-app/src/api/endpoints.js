@@ -28,6 +28,7 @@ const ENDPOINTS = {
     CREATE: "/Plato/add-plato",
     UPDATE: "/Plato/update-Plato",
     DELETE: "/Plato/delete-by-id",
+    GET_ALL_ASOCIADOS_MENU: "/Plato/get-all-asociados-menu",
   },
 
   CATEGORIA_PLATO: {
@@ -83,7 +84,64 @@ const ENDPOINTS = {
     GET_ALL: "/ManagerTarjeta/get-all-tarjeta",
     GET_BY_ID: (id) => `/ManagerTarjeta/get-tarjeta-by-id/${id}`,
     EDITAR: (id) => `/ManagerTarjeta/editar-tarjeta/${id}`,
+
   },
+
+   
+
+  RESERVA: {
+  GET_ALL: "/Reserva/get-all-reservas",
+  GET_BY_ID: (id) => `/Reserva/get-by-id/${id}`,
+  CREATE: "/Reserva/add-reserva",
+  UPDATE: (id) => `/Reserva/update-reserva/${id}`,
+  DELETE: (id) => `/Reserva/delete-by-id/${id}`,
+  CAMBIAR_EN_PROCESO: (id) => `/Reserva/cambiar-reserva-en-Proceso/${id}`,
+  CAMBIAR_NO_ASISTIO: (id) => `/Reserva/cambiar-reserva-no-asistio/${id}`,
+  FINALIZAR: (id) => `/Reserva/finalizar-reserva/${id}`,
+  CANCELAR: (id) => `/Reserva/cancelar-reserva/${id}`,
+},
+
+
+PEDIDO: {
+  GET_ALL: "/Pedido/get-all-pedidos",
+  GET_BY_ID: (id) => `/Pedido/get-pedido-con-detalles/${id}`,
+  CREATE: "/Pedido/add-pedido",
+  UPDATE: (id) => `/Pedido/update-pedido/${id}`,
+  DELETE: (id) => `/Pedido/delete-pedido/${id}`,
+  CAMBIAR_EN_PREPARACION: (id) => `/Pedido/cambiar-pedido-en-Preparacion/${id}`,
+  CAMBIAR_LISTO: (id) => `/Pedido/cambiar-pedido-listo/${id}`,
+  CANCELAR: (id) => `/Pedido/cancelar-pedido/${id}`,
+  FINALIZAR: (id) => `/Pedido/finalizar-pedido/${id}`,
+},
+
+EMPLEADO: {
+  GET_ALL: "/Empleado/Get-all-empleados",
+  GET_ALL_ACTIVOS: "/Empleado/Get-all-empleados-activos",
+  GET_BY_ID: (id) => `/Empleado/Get-by-id/${id}`,
+  CREATE: "/Empleado/add-empleado",
+  UPDATE: (id) => `/Empleado/edit-empleado/${id}`,
+  DELETE: (id) => `/Empleado/delete-empleado/${id}`,
+  ACTIVAR: (id) => `/Empleado/activar-empleado/${id}`,
+  INACTIVAR: (id) => `/Empleado/inactivar-empleado/${id}`,
+},
+
+PUESTO: {
+  GET_ALL: "/Puesto/get-all-puesto",
+},
+
+
+SHIFT: {
+  GET_ALL: "/Shift/Get-all-turnos-by-restaurante",
+  GET_BY_ID: (id) => `/Shift/Get-by-id/${id}`,
+  CREATE: "/Shift/add-turno",
+  UPDATE: (id) => `/Shift/edit-turno/${id}`,
+  DELETE: (id) => `/Shift/delete-turno/${id}`,
+  GET_ALL_EMPLEADOS_TURNOS: "/Shift/Get-all-turnos-empleados",
+  ASOCIAR_EMPLEADO: "/Shift/asociar-turno-empleado",
+  DESASOCIAR_EMPLEADO: (id) => `/Shift/delete-turno-empleado/${id}`,
+},
+
+
 };
 
 export default ENDPOINTS;

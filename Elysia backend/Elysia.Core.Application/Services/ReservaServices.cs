@@ -214,10 +214,11 @@ namespace Elysia.Core.Application.Services
                     return response;
                 }
 
-                if (dto.FechaCreacion < dto.FechaReserva)
+                if (dto.FechaCreacion > dto.FechaReserva)
                 {
                     response.HasError = true;
                     response.Errors.Add("La fecha de reserva no pueder anterior a la fecha de creacion");
+                    return response;
                 }
 
                 if(dto.Estado == EstadoReserva.EnProceso)
@@ -253,8 +254,7 @@ namespace Elysia.Core.Application.Services
                 dto.IdPropietario = reserva.IdPropietario;
                 dto.Id = reserva.Id;    
                 var data = await base.UpdateAsync(id,dto);
-                var map = _mapper.Map<ReservaResponseDto>(data);
-                return map;
+                return data;
 
 
 
@@ -400,7 +400,7 @@ namespace Elysia.Core.Application.Services
                 if (data.Any())
                 {
                     var map = _mapper.Map<List<ReservaResponseDto>>(data);
-                    return map;
+                    return map.ToList();
                 }
 
                 return [];

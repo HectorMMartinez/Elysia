@@ -38,9 +38,11 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy
-                 .WithOrigins("http://localhost:5173") //para que funcione el despligue del entorno dev
+                 .WithOrigins("http://localhost:5174", "http://localhost:5173") //para que funcione el despligue del entorno dev
+                  
                 .AllowAnyMethod()
-                .AllowAnyHeader();
+                .AllowAnyHeader()
+                .AllowCredentials();
         });
 });
 

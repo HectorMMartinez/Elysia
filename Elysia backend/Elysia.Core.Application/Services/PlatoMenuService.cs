@@ -83,8 +83,6 @@ namespace Elysia.Core.Application.Services
 
 
 
-
-
         public async Task<MostrarMenuConPlatosListDto> GetMenusConPlatosAsync(string propietario)
         {
             var response = new MostrarMenuConPlatosListDto()
