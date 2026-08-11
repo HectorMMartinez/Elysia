@@ -98,15 +98,15 @@ export default function OwnerSidebar({ children }) {
       premiumOnly: false,
     },
     {
-      label: "Turnos",
-      path: "/turnos",
-      icon: FaClock,
-      premiumOnly: true,
-    },
-    {
       label: "Empleados",
       path: "/empleados",
       icon: FaUsers,
+      premiumOnly: true,
+    },
+    {
+      label: "Turnos",
+      path: "/turnos",
+      icon: FaClock,
       premiumOnly: true,
     },
     {
@@ -165,7 +165,7 @@ export default function OwnerSidebar({ children }) {
           </div>
         </div>
 
-        <nav className="flex-1 space-y-2 p-4">
+        <nav className="flex-1 space-y-2 p-4 overflow-y-auto">
           {menuVisible.map((item) => {
             const Icon = item.icon;
             return (
