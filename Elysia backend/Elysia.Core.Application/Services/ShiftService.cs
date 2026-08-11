@@ -96,7 +96,7 @@ namespace Elysia.Core.Application.Services
                 }
 
 
-                var data = await shiftRepository.GetlAllAsync();
+                var data = await shiftRepository.GetAllTurnoByPropietarioId(entity.PropietarioId);
                 foreach (var item in data)
                 {
                     if (item.StartTime == entity.StartTime && item.EndTime == entity.EndTime)
@@ -114,8 +114,8 @@ namespace Elysia.Core.Application.Services
                         return response;
                     }
 
-
                 }
+
 
 
                 var result = await base.AddAsync(entity);
@@ -233,7 +233,8 @@ namespace Elysia.Core.Application.Services
                 }
 
 
-                var data = await shiftRepository.GetlAllAsync();
+
+                var data = await shiftRepository.GetAllTurnoByPropietarioId(entity.PropietarioId);
                 foreach (var item in data)
                 {
                     if (item.StartTime == entity.StartTime && item.EndTime == entity.EndTime && item.Id != id)
