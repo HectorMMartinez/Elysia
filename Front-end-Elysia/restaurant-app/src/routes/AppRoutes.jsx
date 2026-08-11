@@ -12,7 +12,7 @@ import OwnerDashboardPage from "../pages/dashboard/OwnerDashboardPage";
 import InventoryPage from "../pages/inventory/InventoryPage";
 import PlatosPage from "../pages/dishes/PlatosPage";
 import { TablesPage } from "../pages/tables/TablesPage";
-// import MenuPage from "../pages/menu/MenuPage";
+import MenuPage from "../pages/menu/MenuPage";
 import ReservasPage from "../pages/reservas/ReservasPage";
 import PedidosPage from "../pages/pedido/PedidosPage";
 import TurnosPage from "../pages/shifts/TurnosPage";
@@ -82,6 +82,15 @@ export default function AppRoutes() {
         />
 
 
+        <Route
+          path="/menu"
+          element={
+            <PrivateRoute>
+              <MenuPage />
+            </PrivateRoute>
+          }
+        />
+
           <Route
           path="/reservas"
           element={
@@ -127,10 +136,10 @@ export default function AppRoutes() {
           element={
             <PrivateRoute>
               <TurnosPage/>
+
             </PrivateRoute>
           }
         />
-
 
         {/* ========== RUTAS ADMIN ========== */}
         <Route

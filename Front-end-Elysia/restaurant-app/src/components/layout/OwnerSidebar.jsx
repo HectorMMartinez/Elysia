@@ -134,10 +134,10 @@ export default function OwnerSidebar({ children }) {
   });
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex h-screen w-full overflow-hidden bg-slate-50">
       {/* Tu menú lateral original */}
       <aside
-        className={`flex min-h-screen flex-col bg-slate-900 text-white transition-all duration-300 ${
+        className={`flex h-full shrink-0 overflow-y-auto flex-col bg-slate-900 text-white transition-all duration-300 ${
           collapsed ? "w-20" : "w-72"
         }`}
       >
@@ -221,7 +221,7 @@ export default function OwnerSidebar({ children }) {
       </aside>
 
       {/* Área donde se renderiza la vista activa (Mesas, Inventario, Platos, etc.) */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 min-w-0 h-full overflow-y-auto">
         {children}
       </main>
     </div>

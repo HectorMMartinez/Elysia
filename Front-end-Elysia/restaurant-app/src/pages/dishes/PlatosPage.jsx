@@ -183,17 +183,15 @@ export default function PlatosPage() {
   }, [platos, categoriasPorId, search, categoryFilter]);
 
   return (
-    <div className="flex min-h-screen bg-slate-100">
-      <OwnerSidebar />
-
-      <main className="flex-1 overflow-x-hidden p-4 md:p-8">
+    <OwnerSidebar>
+      <div className="p-4 md:p-8">
         <header className="mb-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-slate-800 md:text-4xl">
               Platos
             </h1>
             <p className="mt-2 text-slate-500">
-              Consulta los platos, sus categorias y su estado operativo.
+              Consulta los platos, sus categorías y su estado operativo.
             </p>
           </div>
 
@@ -227,7 +225,7 @@ export default function PlatosPage() {
             className="bg-red-100 text-red-600"
           />
           <SummaryCard
-            title="Categorias usadas"
+            title="Categorías usadas"
             value={summary.categorias}
             icon={<FaBoxOpen />}
             className="bg-amber-100 text-amber-600"
@@ -243,7 +241,7 @@ export default function PlatosPage() {
                   type="search"
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Buscar por nombre, descripcion, codigo o categoria..."
+                  placeholder="Buscar por nombre, descripción, código o categoría..."
                   className="w-full rounded-xl border border-slate-300 py-3 pl-11 pr-4 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
                 />
               </div>
@@ -256,7 +254,7 @@ export default function PlatosPage() {
                   }
                   className="rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-violet-500"
                 >
-                  <option value={FILTERS.ALL}>Todas las categorias</option>
+                  <option value={FILTERS.ALL}>Todas las categorías</option>
                   {categorias.map((categoria) => (
                     <option key={categoria.id} value={categoria.id}>
                       {categoria.nombre}
@@ -292,8 +290,8 @@ export default function PlatosPage() {
           {!loading && !error && platos.length === 0 && (
             <StateMessage
               icon={<FaUtensils />}
-              title="Todavia no hay platos"
-              text="Cuando registres platos, apareceran en esta lista."
+              title="Todavía no hay platos"
+              text="Cuando registres platos, aparecerán en esta lista."
             />
           )}
 
@@ -304,7 +302,7 @@ export default function PlatosPage() {
               <StateMessage
                 icon={<FaSearch />}
                 title="No encontramos resultados"
-                text="Prueba otra busqueda o cambia la categoria."
+                text="Prueba otra búsqueda o cambia la categoría."
               />
             )}
 
@@ -316,7 +314,7 @@ export default function PlatosPage() {
                     <tr>
                       {[
                         "Plato",
-                        "Categoria",
+                        "Categoría",
                         "Precio",
                         "Ingredientes",
                         "Estado",
@@ -338,7 +336,7 @@ export default function PlatosPage() {
                       const categoriaNombre =
                         plato.nombreCategoria ||
                         categoriasPorId[String(plato.categoriaId)] ||
-                        "Sin categoria";
+                        "Sin categoría";
                       const ingredientes = Array.isArray(
                         plato.listDataProducto
                       )
@@ -452,25 +450,25 @@ export default function PlatosPage() {
             </>
           )}
         </section>
-      </main>
 
-      <DishModal
-        open={dishModalOpen}
-        mode={dishModalMode}
-        plato={selectedDish}
-        categorias={categorias}
-        productos={productos}
-        onClose={closeDishModal}
-        onSuccess={cargarDatos}
-      />
+        <DishModal
+          open={dishModalOpen}
+          mode={dishModalMode}
+          plato={selectedDish}
+          categorias={categorias}
+          productos={productos}
+          onClose={closeDishModal}
+          onSuccess={cargarDatos}
+        />
 
-      <DeleteDishModal
-        open={deleteModalOpen}
-        plato={deleteDish}
-        onClose={closeDeleteModal}
-        onSuccess={cargarDatos}
-      />
-    </div>
+        <DeleteDishModal
+          open={deleteModalOpen}
+          plato={deleteDish}
+          onClose={closeDeleteModal}
+          onSuccess={cargarDatos}
+        />
+      </div>
+    </OwnerSidebar>
   );
 }
 

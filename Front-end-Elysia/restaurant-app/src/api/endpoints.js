@@ -9,8 +9,9 @@ const ENDPOINTS = {
 
   PLAN: {
     GET_ALL: "/Plans/Get-All-Planes",
+    CAMBIAR_PLAN: "/Plans/cambiar-plan-usuario",
   },
-  
+
   PRODUCTO: {
     GET_ALL: "/Producto/get-all-product",
     GET_BY_ID: "/Producto/get-product-by-id",
@@ -34,6 +35,15 @@ const ENDPOINTS = {
     GET_ALL: "/CategoriaPlato/get-all-categoriaPlatos",
   },
 
+  MENU: {
+    GET_ALL_WITH_PLATOS: "/Menu/get-all-menu-con-platos",
+    GET_BY_ID: (id) => `/Menu/get-by-id/${id}`,
+    CREATE: "/Menu/add-menu",
+    UPDATE: (id) => `/Menu/update-menu/${id}`,
+    DELETE: (id) => `/Menu/delete-menu/${id}`,
+    ADD_PLATOS: "/Menu/add-platos-all-un-menu",
+    DELETE_PLATO: (id) => `/Menu/delete-plato-de-un-menu/${id}`,
+  },
 
   MESA: {
     GET_ALL: "/Mesa/get-all",
@@ -48,41 +58,36 @@ const ENDPOINTS = {
     GET_PANEL: "/DashboardPropietario/get-panel-propietario",
   },
 
-  PLAN: {
-    // si ya tienes GET_ALL, solo agrega esta línea
-    CAMBIAR_PLAN: "/Plans/cambiar-plan-usuario",
-  },
-
   DASHBOARD_ADMIN: {
     GET_PANEL: "/DashboardAdmin/get-panel-admin",
   },
 
   MANAGER_ACCOUNT: {
-  GET_ALL_PROPIETARIOS: "/ManagerAccount/get-all-user-propietario",
-  GET_ALL_ADMINS: "/ManagerAccount/get-all-user-admin",
-  GET_BY_ID: (id) => `/ManagerAccount/get-user-by-id/${id}`,
-  ACTIVAR: (id) => `/ManagerAccount/activar-user-by-id/${id}`,
-  INACTIVAR: (id) => `/ManagerAccount/inactivar-user-by-id/${id}`,
-  GET_PERFIL: "/ManagerAccount/get-perfil-usuario",
-  EDITAR_PERFIL: "/ManagerAccount/edit-perfil",
+    GET_ALL_PROPIETARIOS: "/ManagerAccount/get-all-user-propietario",
+    GET_ALL_ADMINS: "/ManagerAccount/get-all-user-admin",
+    GET_BY_ID: (id) => `/ManagerAccount/get-user-by-id/${id}`,
+    ACTIVAR: (id) => `/ManagerAccount/activar-user-by-id/${id}`,
+    INACTIVAR: (id) => `/ManagerAccount/inactivar-user-by-id/${id}`,
+    GET_PERFIL: "/ManagerAccount/get-perfil-usuario",
+    EDITAR_PERFIL: "/ManagerAccount/edit-perfil",
   },
 
-
   MEMBRESIA: {
-  GET_ALL: "/Membresia/get-all-membresia",
-  CANCELAR: (id) =>
-    `/Membresia/cancelar-membresia/${id}`,
-  SUSPENDER: (id) =>
-    `/Membresia/suspender-membresia/${id}`,
-  ACTIVAR_POR_UN_MES: (id) =>
-    `/Membresia/activar-membresia-por-un-mes/${id}`,
-   },
+    GET_ALL: "/Membresia/get-all-membresia",
+    CANCELAR: (id) => `/Membresia/cancelar-membresia/${id}`,
+    SUSPENDER: (id) => `/Membresia/suspender-membresia/${id}`,
+    ACTIVAR_POR_UN_MES: (id) =>
+      `/Membresia/activar-membresia-por-un-mes/${id}`,
+  },
 
-   MANAGER_TARJETA: {
+  MANAGER_TARJETA: {
     GET_ALL: "/ManagerTarjeta/get-all-tarjeta",
     GET_BY_ID: (id) => `/ManagerTarjeta/get-tarjeta-by-id/${id}`,
     EDITAR: (id) => `/ManagerTarjeta/editar-tarjeta/${id}`,
-   },
+
+  },
+
+   
 
   RESERVA: {
   GET_ALL: "/Reserva/get-all-reservas",
@@ -135,6 +140,7 @@ SHIFT: {
   ASOCIAR_EMPLEADO: "/Shift/asociar-turno-empleado",
   DESASOCIAR_EMPLEADO: (id) => `/Shift/delete-turno-empleado/${id}`,
 },
+
 
 };
 
