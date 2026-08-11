@@ -55,6 +55,40 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         }
 
 
+
+        [HttpGet("get-all-asociados-menu")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PlatoResponseDto))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAllPlatoAsociadosMenu()
+        {
+            try
+            {
+                var id = User.FindFirst("UId").Value;
+
+                var data = await platoService.GetListPlatoAsiciadosByPropietarioId(id);
+                if (data == null || data.Count == 0)
+                {
+                    return NotFound("No se encontraron platos en el menu, no puedes realizar pedido");
+                }
+
+                return Ok(data);
+
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+
+            }
+
+        }
+
+
+
+
+
+
         [HttpGet("get-by-id-con-ingrediente/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(MostrarPlatoConIngredientesDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -81,6 +115,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
             }
 
         }
+
 
 
 

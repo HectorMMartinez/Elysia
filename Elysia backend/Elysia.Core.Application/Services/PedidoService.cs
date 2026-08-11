@@ -152,6 +152,7 @@ namespace Elysia.Core.Application.Services
                     NombreMesa = mesa.Nombre,
                     TotalPedido = total,
                     Estado = dataPedido.Estado,
+                    FechaCreacion = dataPedido.FechaCreacion,
                     MostrarDetalles = dataDetalles
                                      .Select(x => new MostrarDetallesPedidoDto()
                                      {
@@ -221,14 +222,9 @@ namespace Elysia.Core.Application.Services
                 throw new Exception("Ocurrió un error al intentar obtener los pedidos con estado (cancelados). " + ex.Message);
             }
 
-
-
-
-
-
-
-
         }
+
+
 
         public async Task<List<MostrarPedidoConPlatosDto>> GetAllPedidosEnProcesoAsync(string propietarioId)
         {
@@ -470,10 +466,24 @@ namespace Elysia.Core.Application.Services
                 }
 
 
-                if (mesa.Estado == MesaEstado.Ocupada && pedido.Estado != EstadoPedido.EnPreparacion || pedido.Estado != EstadoPedido.Entregado || pedido.Estado != EstadoPedido.Listo)
+                var pedidosMesa = await pedidoRepository.GetAllPedidosByMesaId(entity.IdMesa);
+
+                var otroPedidoActivo = pedidosMesa.Any(p =>
+                    p.Id != id &&
+                    (
+                        p.Estado == EstadoPedido.Pendiente ||
+                        p.Estado == EstadoPedido.EnPreparacion ||
+                        p.Estado == EstadoPedido.Listo
+                    )
+                );
+
+                if (otroPedidoActivo)
                 {
                     response.HasError = true;
-                    response.Errors.Add("La mesa se encuentra ocupa, no puede realizar el pedido para esa mesa");
+                    response.Errors.Add(
+                        "La mesa se encuentra ocupada por otro pedido y no puede realizar el pedido."
+                    );
+
                     return response;
                 }
 
@@ -499,8 +509,7 @@ namespace Elysia.Core.Application.Services
                 }
 
 
-                var pedidosMesa = await pedidoRepository.GetAllPedidosByMesaId(entity.IdMesa);
-
+                
                 if (pedidosMesa.Count > 0 || pedidosMesa.Any())
                 {
                     foreach (var pedidos in pedidosMesa)
@@ -615,6 +624,7 @@ namespace Elysia.Core.Application.Services
                     NombreMesa = mesa.Nombre,
                     TotalPedido = total,
                     Estado = dataPedido.Estado,
+                    FechaCreacion = dataPedido.FechaCreacion,
                     MostrarDetalles = dataDetalles
                         .Select(x => new MostrarDetallesPedidoDto
                         {
@@ -676,6 +686,7 @@ namespace Elysia.Core.Application.Services
                     NombreMesa = pedido.Mesa.Nombre,
                     TotalPedido = pedido.Total,
                     Estado = pedido.Estado,
+                    FechaCreacion = pedido.FechaCreacion,
                     MostrarDetalles = pedido.DetallesPedidos
                         .Select(x => new MostrarDetallesPedidoDto
                         {
@@ -720,6 +731,7 @@ namespace Elysia.Core.Application.Services
                     IdMesa = pedido.IdMesa,
                     NombreMesa = pedido.Mesa.Nombre,
                     TotalPedido = pedido.Total,
+                    FechaCreacion = pedido.FechaCreacion,
                     Estado = pedido.Estado,
                     MostrarDetalles = pedido.DetallesPedidos
                         .Select(detalle => new MostrarDetallesPedidoDto
@@ -751,7 +763,7 @@ namespace Elysia.Core.Application.Services
             {
 
 
-                if (estado != EstadoPedido.Cancelado && estado != EstadoPedido.Finalizado && estado != EstadoPedido.Entregado && estado != EstadoPedido.EnPreparacion)
+                if (estado != EstadoPedido.Cancelado && estado != EstadoPedido.Finalizado && estado != EstadoPedido.Entregado && estado != EstadoPedido.EnPreparacion && estado != EstadoPedido.Listo)
                 {
                     return false;
 

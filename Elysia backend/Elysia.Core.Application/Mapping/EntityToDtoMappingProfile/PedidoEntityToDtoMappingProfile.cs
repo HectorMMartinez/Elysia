@@ -23,6 +23,13 @@ namespace Elysia.Core.Application.Mapping.EntityToDtoMappingProfile
                 .ForMember(x => x.Estado, opt => opt.Ignore())
                 .ForMember(x => x.DetallesPedidoDtos, opt => opt.MapFrom(src => src.DetallesPedido));
 
+            CreateMap<EditarPedidoDto,Pedido>().ReverseMap()
+                .ForMember(x => x.IdPropietario, opt => opt.Ignore())
+                .ForMember(x => x.FechaActualizacion, opt => opt.Ignore())
+                .ForMember(x => x.FechaCreacion, opt => opt.Ignore())
+                .ForMember(x => x.Estado, opt => opt.Ignore())
+                .ForMember(x => x.DetallesPedidoDtos, opt => opt.MapFrom(src => src.DetallesPedidos));
+
 
             CreateMap<CreatePedidoDto, CreatePedidoRequestDto>()
                 .ReverseMap()

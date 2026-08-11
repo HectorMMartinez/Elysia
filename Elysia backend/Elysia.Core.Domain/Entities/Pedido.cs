@@ -20,7 +20,7 @@ namespace Elysia.Core.Domain.Entities
 
 
         //navigation property
-        public Mesa Mesa { get; set; } = new Mesa();
+        public Mesa? Mesa { get; set; } 
         public ICollection<DetallesPedido> DetallesPedidos { get; set; } = new List<DetallesPedido>();  
 
     }
