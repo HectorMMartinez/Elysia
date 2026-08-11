@@ -19,6 +19,7 @@ import ProductModal from "../../components/inventory/ProductModal";
 import InventoryMovementModal from "../../components/inventory/InventoryMovementModal";
 import DeleteProductModal from "../../components/inventory/DeleteProductModal";
 import { getProductImageUrl } from "../../utils/imageHelper";
+
 const FILTERS = {
   ALL: "all",
   ACTIVE: "active",
@@ -35,8 +36,6 @@ const stockStatus = (product) => {
   if (current <= minimum) return { label: "Stock bajo", className: "bg-amber-100 text-amber-700" };
   return { label: "Disponible", className: "bg-green-100 text-green-700" };
 };
-
-
 
 export default function InventoryPage() {
   const [productos, setProductos] = useState([]);
@@ -67,13 +66,13 @@ export default function InventoryPage() {
   };
 
   const openDeleteModal = (product) => {
-      setDeleteProduct(product);
-      setDeleteModalOpen(true);
+    setDeleteProduct(product);
+    setDeleteModalOpen(true);
   };
 
   const closeDeleteModal = () => {
-      setDeleteModalOpen(false);
-      setDeleteProduct(null);
+    setDeleteModalOpen(false);
+    setDeleteProduct(null);
   };
 
   useEffect(() => {
@@ -154,10 +153,8 @@ export default function InventoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex">
-      <OwnerSidebar />
-
-      <main className="flex-1 overflow-x-hidden p-4 md:p-8">
+    <OwnerSidebar>
+      <div className="p-4 md:p-8">
         <header className="mb-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-slate-800 md:text-4xl">Inventario</h1>
@@ -311,9 +308,9 @@ export default function InventoryPage() {
                                 title="Eliminar producto"
                                 className="text-red-600 hover:bg-red-50"
                                 onClick={() => openDeleteModal(product)}
-                            >
+                              >
                                 <FaTrash />
-                            </ActionButton>
+                              </ActionButton>
                             </div>
                           </td>
                         </tr>
@@ -330,31 +327,31 @@ export default function InventoryPage() {
             </>
           )}
         </section>
-      </main>
 
-      <ProductModal
-        open={productModalOpen}
-        mode={productModalMode}
-        product={selectedProduct}
-        onClose={closeProductModal}
-        onSuccess={cargarProductos}
-      />
+        <ProductModal
+          open={productModalOpen}
+          mode={productModalMode}
+          product={selectedProduct}
+          onClose={closeProductModal}
+          onSuccess={cargarProductos}
+        />
 
-      <InventoryMovementModal
-        open={movementModalOpen}
-        type={movementType}
-        product={movementProduct}
-        onClose={closeMovementModal}
-        onSuccess={cargarProductos}
-      />
+        <InventoryMovementModal
+          open={movementModalOpen}
+          type={movementType}
+          product={movementProduct}
+          onClose={closeMovementModal}
+          onSuccess={cargarProductos}
+        />
 
-      <DeleteProductModal
+        <DeleteProductModal
           open={deleteModalOpen}
           product={deleteProduct}
           onClose={closeDeleteModal}
           onSuccess={cargarProductos}
-      />
-    </div>
+        />
+      </div>
+    </OwnerSidebar>
   );
 }
 

@@ -35,7 +35,6 @@ export default function OwnerDashboardPage() {
     if (res.success) {
       setPanel(res.data);
 
-      // Guardamos el planId actual en el storage
       const authActual = storage.getAuth();
       if (authActual) {
         storage.saveAuth({
@@ -71,7 +70,6 @@ export default function OwnerDashboardPage() {
     const res = await dashboardService.cambiarPlan(usuarioId);
 
     if (res.success) {
-      // Actualizamos el plan en el storage
       const authActual = storage.getAuth();
       if (authActual) {
         storage.saveAuth({
@@ -81,8 +79,6 @@ export default function OwnerDashboardPage() {
       }
 
       setShowModal(false);
-
-      // Recargamos para que el Sidebar muestre las nuevas opciones
       window.location.reload();
     } else {
       alert(res.message || "No se pudo cambiar el plan");
@@ -92,23 +88,21 @@ export default function OwnerDashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-100 flex">
-        <OwnerSidebar />
-        <main className="flex-1 p-8 flex items-center justify-center">
+      <OwnerSidebar>
+        <div className="flex-1 min-w-0 h-full overflow-y-auto p-8 flex items-center justify-center">
           <div className="text-center">
             <div className="w-12 h-12 border-4 border-violet-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
             <p className="mt-4 text-slate-600">Cargando panel...</p>
           </div>
-        </main>
-      </div>
+        </div>
+      </OwnerSidebar>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-100 flex">
-        <OwnerSidebar />
-        <main className="flex-1 p-8 flex items-center justify-center">
+      <OwnerSidebar>
+        <div className="flex-1 min-w-0 h-full overflow-y-auto p-8 flex items-center justify-center">
           <div className="bg-white p-8 rounded-2xl shadow-sm text-center max-w-md">
             <p className="text-red-600 font-medium">{error}</p>
             <button
@@ -118,8 +112,8 @@ export default function OwnerDashboardPage() {
               Reintentar
             </button>
           </div>
-        </main>
-      </div>
+        </div>
+      </OwnerSidebar>
     );
   }
 
@@ -128,10 +122,8 @@ export default function OwnerDashboardPage() {
   const esPremium = panel.planId === 2;
 
   return (
-    <div className="min-h-screen bg-slate-100 flex">
-      <OwnerSidebar />
-
-      <main className="flex-1 p-8">
+    <OwnerSidebar>
+      <div className="p-4 md:p-8">
         {/* HEADER */}
         <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
@@ -316,7 +308,7 @@ export default function OwnerDashboardPage() {
                   Diseñado para restaurantes que requieren una gestión estratégica
                   y basada en datos. Incluye todas las funcionalidades del Plan
                   Simple, además de reportes operativos avanzados, análisis de
-                  ventas, estadísticas de inventario, indicadores de desempeño,gestion de empleados,
+                  ventas, estadísticas de inventario, indicadores de desempeño, gestion de empleados,
                   gestión de turnos, centrar de inteligencia,
                   alertas inteligentes y recomendaciones automáticas.
                 </p>
@@ -338,43 +330,43 @@ export default function OwnerDashboardPage() {
             )}
           </div>
         </div>
-      </main>
 
-      {/* MODAL */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
-            <h3 className="text-2xl font-bold text-slate-800 mb-3">
-              ¿Mejorar a Plan Premium?
-            </h3>
-            <p className="text-slate-600 mb-2">
-              Al confirmar, tu cuenta pasará al Plan Premium (RD$ 3,500 / mes).
-            </p>
-            <p className="text-slate-500 text-sm mb-6">
-              Tendrás acceso a Turnos, Empleados, Central de Inteligencia y todos
-              los reportes avanzados.
-            </p>
+        {/* MODAL */}
+        {showModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
+              <h3 className="text-2xl font-bold text-slate-800 mb-3">
+                ¿Mejorar a Plan Premium?
+              </h3>
+              <p className="text-slate-600 mb-2">
+                Al confirmar, tu cuenta pasará al Plan Premium (RD$ 3,500 / mes).
+              </p>
+              <p className="text-slate-500 text-sm mb-6">
+                Tendrás acceso a Turnos, Empleados, Central de Inteligencia y todos
+                los reportes avanzados.
+              </p>
 
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowModal(false)}
-                disabled={cambiandoPlan}
-                className="flex-1 border border-slate-300 text-slate-700 py-3 rounded-xl font-medium hover:bg-slate-50"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleCambiarPlan}
-                disabled={cambiandoPlan}
-                className="flex-1 bg-violet-600 text-white py-3 rounded-xl font-medium hover:bg-violet-700 disabled:opacity-60"
-              >
-                {cambiandoPlan ? "Cambiando..." : "Confirmar"}
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowModal(false)}
+                  disabled={cambiandoPlan}
+                  className="flex-1 border border-slate-300 text-slate-700 py-3 rounded-xl font-medium hover:bg-slate-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleCambiarPlan}
+                  disabled={cambiandoPlan}
+                  className="flex-1 bg-violet-600 text-white py-3 rounded-xl font-medium hover:bg-violet-700 disabled:opacity-60"
+                >
+                  {cambiandoPlan ? "Cambiando..." : "Confirmar"}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </OwnerSidebar>
   );
 }
 
