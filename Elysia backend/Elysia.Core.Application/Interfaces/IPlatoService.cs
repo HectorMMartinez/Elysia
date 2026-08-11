@@ -12,5 +12,6 @@ namespace Elysia.Core.Application.Interfaces
     {
         Task<List<MostrarPlatoConIngredientesDto?>> GetlAllConIngredientesAsync(string propietarioId);
         Task<MostrarPlatoConIngredientesDto?> GetByIdConIgrendientesAsync(int id);
+        Task<List<PlatoResponseDto>> GetListPlatoAsiciadosByPropietarioId(string propietarioId);
     }
 }

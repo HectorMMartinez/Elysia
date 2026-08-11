@@ -24,16 +24,20 @@ namespace Elysia.Core.Application.Services
         private readonly IPlatoRepository repo;
         private readonly ICategoriaPlatoRepository categoriaPlatoRepository;
         private readonly IProductoRepository productoRepository;
+        private readonly IPlatoMenuRepository platoMenuRepository;
 
 
-        public PlatoService(IPlatoRepository repo, IPlatoProductoRepository platoProductoRepository, ICategoriaPlatoRepository categoriaPlatoRepository, IProductoRepository productoRepository, IMapper _mapper) : base(repo, _mapper)
+        public PlatoService(IPlatoMenuRepository platoMenuRepository, IPlatoRepository repo, IPlatoProductoRepository platoProductoRepository, ICategoriaPlatoRepository categoriaPlatoRepository, IProductoRepository productoRepository, IMapper _mapper) : base(repo, _mapper)
         {
             this._mapper = _mapper;
             this.repo = repo;
             this.platoProductoRepository = platoProductoRepository;
             this.categoriaPlatoRepository = categoriaPlatoRepository;
             this.productoRepository = productoRepository;
+            this.platoMenuRepository = platoMenuRepository;
         }
+
+
 
 
 
@@ -94,6 +98,38 @@ namespace Elysia.Core.Application.Services
             }
 
 
+        }
+
+
+
+        public async Task<List<PlatoResponseDto>> GetListPlatoAsiciadosByPropietarioId(string propietarioId)
+        {
+
+            try
+            {
+                var data = await repo.GetAllByPropietarioId(propietarioId);
+                var listAsociados = new List<PlatoResponseDto>();
+                foreach (var plato in data)
+                {
+                   var is_asociado_menu = await platoMenuRepository.GetListByPlatoId(plato.Id);
+                    if (is_asociado_menu != null)
+                    {
+                        var asociado = _mapper.Map<PlatoResponseDto>(plato);
+                        listAsociados.Add(asociado);
+                    }
+                }
+
+                return listAsociados;
+
+            }
+            catch (Exception ex)
+            {
+
+
+                throw new Exception($"Ocurrio un error al intentar obtener los platos asociados a menu:{ex.Message}");
+
+
+            }
         }
 
 
@@ -220,9 +256,9 @@ namespace Elysia.Core.Application.Services
                 p => p.Id,
                 (pp, p) => new PlatoProductoDataDto
                 {
-                 ProductoId = p.Id,
-                 NombreProducto = p.Nombre,
-                 CantidaProducto = pp.Cantidad
+                    ProductoId = p.Id,
+                    NombreProducto = p.Nombre,
+                    CantidaProducto = pp.Cantidad
                 }).ToList();
 
                 result.Add(dto);

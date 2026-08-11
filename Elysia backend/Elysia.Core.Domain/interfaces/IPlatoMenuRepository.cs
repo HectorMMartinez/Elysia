@@ -15,5 +15,6 @@ namespace Elysia.Core.Domain.interfaces
         Task<List<PlatoMenu?>> GetListByMenuId(int menuId);
         Task<PlatoMenu?> GetListByPlatoId(int platoId);
 
+
     }
 }
