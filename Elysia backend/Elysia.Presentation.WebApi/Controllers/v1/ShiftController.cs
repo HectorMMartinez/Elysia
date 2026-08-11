@@ -96,7 +96,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         {
             try
             {
-                if(entity == null || entity.StartTime < TimeOnly.FromDateTime(DateTime.Now) || entity.EndTime < TimeOnly.FromDateTime(DateTime.Now))
+                if(entity == null)
                 {
                     return BadRequest("Debes indicar correctamente los datos para agregar el turno");
                 }
@@ -134,7 +134,7 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
         {
             try
             {
-                if (id <= 0 || entity == null || entity.StartTime < TimeOnly.FromDateTime(DateTime.Now) || entity.EndTime < TimeOnly.FromDateTime(DateTime.Now))
+                if (id <= 0 || entity == null)
                 {
                     return BadRequest("Debes indicar correctamente los datos para agregar el turno");
                 }
