@@ -14,11 +14,13 @@ import PlatosPage from "../pages/dishes/PlatosPage";
 import { TablesPage } from "../pages/tables/TablesPage";
 // import MenuPage from "../pages/menu/MenuPage";
 import ReservasPage from "../pages/reservas/ReservasPage";
-// import PedidosPage from "../pages/pedidos/PedidosPage";
+import PedidosPage from "../pages/pedido/PedidosPage";
 // import TurnosPage from "../pages/turnos/TurnosPage";
-// import EmpleadosPage from "../pages/empleados/EmpleadosPage";
+import EmpleadosPage from "../pages/empleado/EmpleadosPage";
 // import CentralInteligenciaPage from "../pages/central/CentralInteligenciaPage";
-// import OwnerPerfilPage from "../pages/perfil/OwnerPerfilPage";
+import OwnerProfilePage from "../pages/owner/OwnerProfilePage";
+
+
 
 // Admin
 import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
@@ -89,16 +91,37 @@ export default function AppRoutes() {
           }
         />
 
-        {/* Descomenta cuando tengas las páginas listas */}
-        {/* 
-        <Route path="/menu" element={<PrivateRoute><MenuPage /></PrivateRoute>} />
-        <Route path="/reservas" element={<PrivateRoute><ReservasPage /></PrivateRoute>} />
-        <Route path="/pedidos" element={<PrivateRoute><PedidosPage /></PrivateRoute>} />
-        <Route path="/turnos" element={<PrivateRoute><TurnosPage /></PrivateRoute>} />
-        <Route path="/empleados" element={<PrivateRoute><EmpleadosPage /></PrivateRoute>} />
-        <Route path="/central-inteligencia" element={<PrivateRoute><CentralInteligenciaPage /></PrivateRoute>} />
-        <Route path="/perfil" element={<PrivateRoute><OwnerPerfilPage /></PrivateRoute>} />
-        */}
+
+        
+        <Route
+          path="/pedidos"
+          element={
+            <PrivateRoute>
+              <PedidosPage/>
+            </PrivateRoute>
+          }
+        />
+
+           
+        <Route
+          path="/perfil"
+          element={
+            <PrivateRoute>
+              <OwnerProfilePage/>
+            </PrivateRoute>
+          }
+        />
+
+
+        <Route
+          path="/empleados"
+          element={
+            <PrivateRoute>
+              <EmpleadosPage/>
+            </PrivateRoute>
+          }
+        />
+
 
         {/* ========== RUTAS ADMIN ========== */}
         <Route

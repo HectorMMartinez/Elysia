@@ -264,3 +264,17 @@ export const obtenerProductosParaIngredientes = async () => {
     });
   }
 };
+
+
+export const obtenerPlatosAsociadosMenu = async () => {
+  try {
+    const response = await axiosClient.get(
+      ENDPOINTS.PLATO.GET_ALL_ASOCIADOS_MENU
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(obtenerMensajeError(error), {
+      cause: error,
+    });
+  }
+};

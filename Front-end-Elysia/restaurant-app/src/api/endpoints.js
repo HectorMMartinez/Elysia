@@ -27,6 +27,7 @@ const ENDPOINTS = {
     CREATE: "/Plato/add-plato",
     UPDATE: "/Plato/update-Plato",
     DELETE: "/Plato/delete-by-id",
+    GET_ALL_ASOCIADOS_MENU: "/Plato/get-all-asociados-menu",
   },
 
   CATEGORIA_PLATO: {
@@ -93,6 +94,33 @@ const ENDPOINTS = {
   CAMBIAR_NO_ASISTIO: (id) => `/Reserva/cambiar-reserva-no-asistio/${id}`,
   FINALIZAR: (id) => `/Reserva/finalizar-reserva/${id}`,
   CANCELAR: (id) => `/Reserva/cancelar-reserva/${id}`,
+},
+
+
+PEDIDO: {
+  GET_ALL: "/Pedido/get-all-pedidos",
+  GET_BY_ID: (id) => `/Pedido/get-pedido-con-detalles/${id}`,
+  CREATE: "/Pedido/add-pedido",
+  UPDATE: (id) => `/Pedido/update-pedido/${id}`,
+  DELETE: (id) => `/Pedido/delete-pedido/${id}`,
+  CAMBIAR_EN_PREPARACION: (id) => `/Pedido/cambiar-pedido-en-Preparacion/${id}`,
+  CAMBIAR_LISTO: (id) => `/Pedido/cambiar-pedido-listo/${id}`,
+  CANCELAR: (id) => `/Pedido/cancelar-pedido/${id}`,
+  FINALIZAR: (id) => `/Pedido/finalizar-pedido/${id}`,
+},
+EMPLEADO: {
+  GET_ALL: "/Empleado/Get-all-empleados",
+  GET_ALL_ACTIVOS: "/Empleado/Get-all-empleados-activos",
+  GET_BY_ID: (id) => `/Empleado/Get-by-id/${id}`,
+  CREATE: "/Empleado/add-empleado",
+  UPDATE: (id) => `/Empleado/edit-empleado/${id}`,
+  DELETE: (id) => `/Empleado/delete-empleado/${id}`,
+  ACTIVAR: (id) => `/Empleado/activar-empleado/${id}`,
+  INACTIVAR: (id) => `/Empleado/inactivar-empleado/${id}`,
+},
+
+PUESTO: {
+  GET_ALL: "/Puesto/get-all-puesto",
 },
 
 };

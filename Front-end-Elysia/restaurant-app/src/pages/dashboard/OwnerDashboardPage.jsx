@@ -25,7 +25,7 @@ export default function OwnerDashboardPage() {
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [cambiandoPlan, setCambiandoPlan] = useState(false);
-
+  const API_URL = "https://localhost:7108/";
   const cargarPanel = async () => {
     setLoading(true);
     setError(null);
@@ -136,7 +136,7 @@ export default function OwnerDashboardPage() {
         <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
             <img
-              src={panel.image}
+              src={API_URL+panel.image}
               alt="Foto de perfil"
               className="w-16 h-16 rounded-full object-cover border-4 border-white shadow"
               onError={(e) => {
