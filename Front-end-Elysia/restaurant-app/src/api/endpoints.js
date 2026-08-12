@@ -10,6 +10,7 @@ const ENDPOINTS = {
   PLAN: {
     GET_ALL: "/Plans/Get-All-Planes",
     CAMBIAR_PLAN: "/Plans/cambiar-plan-usuario",
+    CAMBIAR_PLAN_A_SIMPLE: (id) => `/Plans/cambiar-plan-a-simple/${id}`,
   },
 
   PRODUCTO: {

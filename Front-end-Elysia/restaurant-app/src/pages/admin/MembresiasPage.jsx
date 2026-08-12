@@ -10,11 +10,13 @@ import {
   FaTimesCircle,
   FaUsers,
   FaEye,
+  FaExchangeAlt, // ← nuevo icono
 } from "react-icons/fa";
 
 import AdminSidebar from "../../components/layout/AdminSidebar";
 import MembresiaActionModal from "../../components/admin/MembresiaActionModal";
 import membresiaService from "../../services/membresiaService";
+import planService from "../../services/planService"; // ← NUEVO
 
 // Helper para badges de estado
 const getStatusConfig = (estado) => {
@@ -97,7 +99,11 @@ export default function MembresiasPage() {
         err.response?.data ||
         err.message ||
         "No fue posible cargar las membresías.";
-      setError(typeof message === "string" ? message : "No fue posible cargar las membresías.");
+      setError(
+        typeof message === "string"
+          ? message
+          : "No fue posible cargar las membresías."
+      );
     } finally {
       setLoading(false);
     }
@@ -178,18 +184,34 @@ export default function MembresiasPage() {
         await membresiaService.suspender(selectedMembresia.id);
       } else if (action === "cancelar") {
         await membresiaService.cancelar(selectedMembresia.id);
+      } else if (action === "cambiar-simple") {
+        // ⚠️ El endpoint necesita el ID del USUARIO (propietario)
+        const userId =
+          selectedMembresia.userId ||
+          selectedMembresia.propietarioId ||
+          selectedMembresia.usuarioId;
+
+        if (!userId) {
+          throw new Error(
+            "No se encontró el ID del usuario propietario en la membresía."
+          );
+        }
+
+        await planService.cambiarPlanASimple(userId);
       }
 
       setSelectedMembresia(null);
       setAction(null);
       await cargarMembresias();
     } catch (err) {
-      console.error("Error al cambiar estado de membresía:", err);
+      console.error("Error al ejecutar acción de membresía:", err);
       const message =
         err.response?.data ||
         err.message ||
-        "No fue posible cambiar el estado de la membresía.";
-      setError(typeof message === "string" ? message : "No fue posible cambiar el estado de la membresía.");
+        "No fue posible realizar la acción.";
+      setError(
+        typeof message === "string" ? message : "No fue posible realizar la acción."
+      );
     } finally {
       setActionLoading(false);
     }
@@ -256,7 +278,9 @@ export default function MembresiasPage() {
               <p className="text-sm font-medium text-slate-500">Activas</p>
               <FaCheckCircle className="text-emerald-400" />
             </div>
-            <p className="text-3xl font-bold text-emerald-600 mt-2">{stats.activas}</p>
+            <p className="text-3xl font-bold text-emerald-600 mt-2">
+              {stats.activas}
+            </p>
           </div>
 
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:shadow-md transition-shadow">
@@ -264,7 +288,9 @@ export default function MembresiasPage() {
               <p className="text-sm font-medium text-slate-500">Suspendidas</p>
               <FaPauseCircle className="text-amber-400" />
             </div>
-            <p className="text-3xl font-bold text-amber-600 mt-2">{stats.suspendidas}</p>
+            <p className="text-3xl font-bold text-amber-600 mt-2">
+              {stats.suspendidas}
+            </p>
           </div>
 
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:shadow-md transition-shadow">
@@ -272,7 +298,9 @@ export default function MembresiasPage() {
               <p className="text-sm font-medium text-slate-500">Canceladas</p>
               <FaTimesCircle className="text-rose-400" />
             </div>
-            <p className="text-3xl font-bold text-rose-600 mt-2">{stats.canceladas}</p>
+            <p className="text-3xl font-bold text-rose-600 mt-2">
+              {stats.canceladas}
+            </p>
           </div>
         </div>
 
@@ -355,7 +383,6 @@ export default function MembresiasPage() {
 
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
-                  // Skeleton loading
                   Array.from({ length: 5 }).map((_, i) => (
                     <tr key={i}>
                       {Array.from({ length: 7 }).map((_, j) => (
@@ -390,6 +417,12 @@ export default function MembresiasPage() {
                     const isCancelled =
                       estadoLower.includes("cancel") ||
                       estadoLower.includes("inactiv");
+
+                    // Detectar si es plan Premium
+                    const planName = String(membresia.nombrePlan ?? "").toLowerCase();
+                    const isPremium =
+                      membresia.planId === 2 ||
+                      planName.includes("premium");
 
                     return (
                       <tr
@@ -431,6 +464,21 @@ export default function MembresiasPage() {
 
                         <td className="px-6 py-4">
                           <div className="flex flex-wrap justify-end gap-2">
+                            {/* Cambiar a Simple (solo si es Premium) */}
+                            {isPremium && !isCancelled && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  abrirModalAccion(membresia, "cambiar-simple")
+                                }
+                                disabled={actionLoading}
+                                className="rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-700 transition hover:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
+                              >
+                                <FaExchangeAlt className="text-[10px]" />
+                                Cambiar a Simple
+                              </button>
+                            )}
+
                             {!isActive && (
                               <button
                                 type="button"
@@ -496,10 +544,13 @@ export default function MembresiasPage() {
       {actionLoading && (
         <div className="fixed bottom-6 right-6 bg-slate-800 text-white px-5 py-3 rounded-xl shadow-xl flex items-center gap-3 z-50 animate-in slide-in-from-bottom-4">
           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          <span className="text-sm font-medium">Actualizando membresía...</span>
+          <span className="text-sm font-medium">
+            {action === "cambiar-simple"
+              ? "Cambiando a Plan Simple..."
+              : "Actualizando membresía..."}
+          </span>
         </div>
       )}
     </div>
   );
 }
-

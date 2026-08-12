@@ -10,7 +10,13 @@ const planService = {
         );
 
         return response.data;
-    }
+    },
+    async cambiarPlanASimple(userId) {
+    const response = await axiosClient.put(
+      ENDPOINTS.PLAN.CAMBIAR_PLAN_A_SIMPLE(userId)
+    );
+    return response.data;
+  },
 
 };
 
