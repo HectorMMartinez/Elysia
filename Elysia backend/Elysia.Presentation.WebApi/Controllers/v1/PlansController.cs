@@ -154,12 +154,12 @@ namespace Elysia.Presentation.WebApi.Controllers.v1
 
                 if(membrasia.PlanId == 2)
                 {
-                    membrasia.PlanId = 1;
+                    map.PlanId = 1;
                 }
 
                 if(membrasia.FechaFin <= DateTime.Now)
                 {
-                    membrasia.FechaFin = DateTime.Now.AddMonths(1);
+                    map.FechaFin = DateTime.Now.AddMonths(1);
                 }
 
                 var updateMembresia = await membresiaService.UpdateAsync(membrasia.Id, map);
