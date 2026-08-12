@@ -21,10 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Persistences\Repositories\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Elysia.Infraestructure.persistences\Elysia.Infraestructure.persistences.csproj" />
   </ItemGroup>
 
