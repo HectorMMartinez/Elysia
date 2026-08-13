@@ -18,6 +18,7 @@ namespace Elysia.Core.Application.Mapping.EntityToDtoMappingProfile
             CreateMap<Empleado, EditarEmpleadoDto>().ReverseMap();
             CreateMap<EditarEmpleadoRequestDto,EditarEmpleadoDto>().ReverseMap();
             CreateMap<CreateEmpleadoRequestDto, CreateEmpleadoDto>().ReverseMap();
+            CreateMap<EmpleadoResponseDto, CreateEmpleadoDto>().ReverseMap();
             
             
         

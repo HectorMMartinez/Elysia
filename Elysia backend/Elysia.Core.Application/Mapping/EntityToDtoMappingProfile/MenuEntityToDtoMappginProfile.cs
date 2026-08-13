@@ -31,6 +31,8 @@ namespace Elysia.Core.Application.Mapping.EntityToDtoMappingProfile
             CreateMap<CreateMenuDto, Menu>().ReverseMap();
             CreateMap<EditarMenuDto, Menu>().ReverseMap();
             CreateMap<Menu,MenuResponseDto>().ReverseMap();
+            CreateMap<EditarMenuDto,MenuResponseDto>().ReverseMap();
+
            
             
         }
