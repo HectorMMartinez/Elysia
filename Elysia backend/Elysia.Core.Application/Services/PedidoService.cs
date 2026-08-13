@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Elysia.Core.Application.Dtos.movimientoInventario;
 using Elysia.Core.Application.Dtos.pedido;
 using Elysia.Core.Application.Dtos.producto;
 using Elysia.Core.Application.Interfaces;
@@ -27,10 +28,10 @@ namespace Elysia.Core.Application.Services
         private readonly IReservasRepository reservasRepository;
         private readonly IProductoRepository productoRepository;
         private readonly IPlatoProductoRepository platoProductoRepository;
+        private readonly IMovimientoInventarioService movimientoInventarioService1;
 
 
-
-        public PedidoService(IPedidoRepository pedidoRepository, IProductoRepository productoRepository, IPlatoProductoRepository platoProductoRepository, IReservasRepository reservasRepository, IMesaRepository mesaRepository, IPlatoRepository platoRepository, IDetallesPedidoRepository detallesPedidoRepository, IMapper _mapper) : base(pedidoRepository, _mapper)
+        public PedidoService(IMovimientoInventarioService movimientoInventarioService1, IPedidoRepository pedidoRepository, IProductoRepository productoRepository, IPlatoProductoRepository platoProductoRepository, IReservasRepository reservasRepository, IMesaRepository mesaRepository, IPlatoRepository platoRepository, IDetallesPedidoRepository detallesPedidoRepository, IMapper _mapper) : base(pedidoRepository, _mapper)
         {
             this.pedidoRepository = pedidoRepository;
             this.detallesPedidoRepository = detallesPedidoRepository;
@@ -41,6 +42,7 @@ namespace Elysia.Core.Application.Services
             this.platoRepository = platoRepository;
             this.platoProductoRepository = platoProductoRepository;
             this.productoRepository = productoRepository;
+            this.movimientoInventarioService1 = movimientoInventarioService1;
         }
 
 
@@ -804,27 +806,15 @@ namespace Elysia.Core.Application.Services
 
 
 
-
-
-
-
-
-
-
-
-
-
         #region private method
         private async Task<ResponsePedidoDto> ValidarYActualizarStockAsync(CreatePedidoDto dto)
         {
             ResponsePedidoDto response = new();
 
-
             var platoIds = dto.DetallesPedidoDtos
                 .Select(x => x.PlatoId)
                 .Distinct()
                 .ToList();
-
 
             var platosProductos = await platoProductoRepository
                 .GetAllQuariableAsync()
@@ -838,37 +828,32 @@ namespace Elysia.Core.Application.Services
                 return response;
             }
 
-
             var productoIds = platosProductos
                 .Select(x => x.ProductoId)
                 .Distinct()
                 .ToList();
 
             var productos = await productoRepository.GetByIdsAsync(productoIds);
-
             var productosDic = productos.ToDictionary(x => x.Id);
 
-
+            // Calcular productos necesarios
             Dictionary<int, decimal> productosNecesarios = new();
 
             foreach (var detalle in dto.DetallesPedidoDtos)
             {
-                var ingredientes = platosProductos
-                    .Where(x => x.PlatoId == detalle.PlatoId);
+                var ingredientes = platosProductos.Where(x => x.PlatoId == detalle.PlatoId);
 
                 foreach (var ingrediente in ingredientes)
                 {
                     if (!productosNecesarios.ContainsKey(ingrediente.ProductoId))
-                    {
                         productosNecesarios[ingrediente.ProductoId] = 0;
-                    }
 
                     productosNecesarios[ingrediente.ProductoId] +=
                         ingrediente.Cantidad * detalle.Cantidad;
                 }
             }
 
-
+            // Validar stock
             foreach (var item in productosNecesarios)
             {
                 if (!productosDic.TryGetValue(item.Key, out var producto))
@@ -885,25 +870,31 @@ namespace Elysia.Core.Application.Services
                         $"Stock insuficiente para el producto '{producto.Nombre}'. " +
                         $"Se requieren {item.Value} {producto.UnidadMedida} y solo hay {producto.StockActual}."
                     );
-
                     return response;
                 }
             }
 
-
+            // Registrar movimientos de salida (el servicio actualiza el stock)
             foreach (var item in productosNecesarios)
             {
-                productosDic[item.Key].StockActual -= item.Value;
-            }
+                var movimientoDto = new CrearMovimientoInventarioDto
+                {
+                    ProductoId = item.Key,
+                    TipoMovimiento = TipoMovimientoInventario.Salida,
+                    Cantidad = item.Value
+                };
 
+                var resultadoMovimiento = await movimientoInventarioService1.AddAsync(movimientoDto);
 
-            var actualizado = await productoRepository.UpdateRangeAsync(productosDic.Values.ToList());
-
-            if (actualizado == null || !actualizado.Any())
-            {
-                response.HasError = true;
-                response.Errors.Add("Ocurrió un error al actualizar el inventario.");
-                return response;
+                if (resultadoMovimiento == null || resultadoMovimiento.HasError)
+                {
+                    response.HasError = true;
+                    response.Errors.AddRange(
+                        resultadoMovimiento?.Errors
+                        ?? new List<string> { "Error al registrar el movimiento de inventario." }
+                    );
+                    return response;
+                }
             }
 
             response.HasError = false;
@@ -912,12 +903,9 @@ namespace Elysia.Core.Application.Services
 
 
 
-        private async Task<ResponsePedidoDto> ValidarYActualizarStockUpdateAsync(
-         EditarPedidoDto dto,
-          List<DetallesPedido> detallesActuales)
+        private async Task<ResponsePedidoDto> ValidarYActualizarStockUpdateAsync(EditarPedidoDto dto,List<DetallesPedido> detallesActuales)
         {
             ResponsePedidoDto response = new();
-
 
             var platoIds = detallesActuales
                 .Select(x => x.PlatoId)
@@ -937,23 +925,19 @@ namespace Elysia.Core.Application.Services
                 return response;
             }
 
-
             var productoIds = platosProductos
                 .Select(x => x.ProductoId)
                 .Distinct()
                 .ToList();
 
             var productos = await productoRepository.GetByIdsAsync(productoIds);
-
             var productosDic = productos.ToDictionary(x => x.Id);
 
-
+            // Consumo actual
             Dictionary<int, decimal> consumoActual = new();
-
             foreach (var detalle in detallesActuales)
             {
                 var ingredientes = platosProductos.Where(x => x.PlatoId == detalle.PlatoId);
-
                 foreach (var ingrediente in ingredientes)
                 {
                     if (!consumoActual.ContainsKey(ingrediente.ProductoId))
@@ -964,13 +948,11 @@ namespace Elysia.Core.Application.Services
                 }
             }
 
-
+            // Consumo nuevo
             Dictionary<int, decimal> consumoNuevo = new();
-
             foreach (var detalle in dto.DetallesPedidoDtos)
             {
                 var ingredientes = platosProductos.Where(x => x.PlatoId == detalle.PlatoId);
-
                 foreach (var ingrediente in ingredientes)
                 {
                     if (!consumoNuevo.ContainsKey(ingrediente.ProductoId))
@@ -981,20 +963,19 @@ namespace Elysia.Core.Application.Services
                 }
             }
 
-
             var todosLosProductos = consumoActual.Keys
-                .Union(consumoNuevo.Keys);
+                .Union(consumoNuevo.Keys)
+                .ToList();
 
+            // Validar diferencias positivas
             foreach (var productoId in todosLosProductos)
             {
                 decimal cantidadActual = consumoActual.ContainsKey(productoId)
                     ? consumoActual[productoId]
                     : 0;
-
                 decimal cantidadNueva = consumoNuevo.ContainsKey(productoId)
                     ? consumoNuevo[productoId]
                     : 0;
-
                 decimal diferencia = cantidadNueva - cantidadActual;
 
                 if (!productosDic.TryGetValue(productoId, out var producto))
@@ -1011,42 +992,50 @@ namespace Elysia.Core.Application.Services
                         $"No hay suficiente stock del producto '{producto.Nombre}'. " +
                         $"Se necesitan {diferencia} {producto.UnidadMedida} adicionales y solo hay {producto.StockActual}."
                     );
-
                     return response;
                 }
             }
 
-
+            // Registrar movimientos (Salida si aumenta, Entrada si disminuye)
             foreach (var productoId in todosLosProductos)
             {
                 decimal cantidadActual = consumoActual.ContainsKey(productoId)
                     ? consumoActual[productoId]
                     : 0;
-
                 decimal cantidadNueva = consumoNuevo.ContainsKey(productoId)
                     ? consumoNuevo[productoId]
                     : 0;
-
                 decimal diferencia = cantidadNueva - cantidadActual;
 
-                productosDic[productoId].StockActual -= diferencia;
-            }
+                if (diferencia == 0) continue;
 
-            var actualizado = await productoRepository
-                .UpdateRangeAsync(productosDic.Values.ToList());
+                var movimientoDto = new CrearMovimientoInventarioDto
+                {
+                    ProductoId = productoId,
+                    TipoMovimiento = diferencia > 0
+                        ? TipoMovimientoInventario.Salida
+                        : TipoMovimientoInventario.Entrada,
+                    Cantidad = Math.Abs(diferencia)
+                };
 
-            if (actualizado == null || !actualizado.Any())
-            {
-                response.HasError = true;
-                response.Errors.Add("Ocurrió un error al actualizar el inventario.");
-                return response;
+                var resultadoMovimiento = await movimientoInventarioService1.AddAsync(movimientoDto);
+
+                if (resultadoMovimiento == null || resultadoMovimiento.HasError)
+                {
+                    response.HasError = true;
+                    response.Errors.AddRange(
+                        resultadoMovimiento?.Errors
+                        ?? new List<string> { "Error al registrar el movimiento de inventario." }
+                    );
+                    return response;
+                }
             }
 
             response.HasError = false;
             return response;
         }
-
         #endregion
+
 
 
 

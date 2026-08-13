@@ -30,6 +30,7 @@ namespace Elysia.Core.Application.Mapping.EntityToDtoMappingProfile
             CreateMap<Reserva, ReservaResponseDto>().ReverseMap();
             CreateMap<CreateReservaDto,Reserva>().ReverseMap();
             CreateMap<EditarReservaDto, Reserva>().ReverseMap();
+            CreateMap<EditarReservaDto, ReservaResponseDto>().ReverseMap();
                
 
 

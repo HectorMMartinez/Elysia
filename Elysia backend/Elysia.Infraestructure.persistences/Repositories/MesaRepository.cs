@@ -1,4 +1,5 @@
-﻿using Elysia.Core.Domain.Common;
+﻿using Elysia.Core.Application.Dtos.Mesa;
+using Elysia.Core.Domain.Common;
 using Elysia.Core.Domain.Entities;
 using Elysia.Core.Domain.interfaces;
 using Elysia.Infraestructure.persistences.Contexts;
@@ -89,7 +90,44 @@ namespace Elysia.Infraestructure.persistences.Repositories
         }
 
 
+        public async Task<List<MesaEstadisticaDto>> GetMesasConMasReservasAsync(string restauranteId,DateTime fechaDesde)
+        {
+            return await context.Mesas
+                .Where(m => m.IdPropietario == restauranteId)
+                .Select(m => new MesaEstadisticaDto
+                {
+                    IdMesa= m.Id,
+                    Codigo = m.Codigo,
+                    Capacidad = m.Capacidad,
+                    Estado = m.Estado,
 
+                    Cantidad = m.Reservas.Count(r =>
+                        r.IdPropietario == restauranteId &&
+                        r.FechaReserva >= fechaDesde)
+                })
+                .OrderByDescending(m => m.Cantidad)
+                .ToListAsync();
+        }
+
+
+        public async Task<List<MesaEstadisticaDto>> GetMesasConMasPedidosAsync(string restauranteId,DateTime fechaDesde)
+        {
+            return await context.Mesas
+                .Where(m => m.IdPropietario == restauranteId)
+                .Select(m => new MesaEstadisticaDto
+                {
+                    IdMesa = m.Id,
+                    Codigo = m.Codigo,
+                    Capacidad = m.Capacidad,
+                    Estado = m.Estado,
+
+                    Cantidad = m.Pedidos.Count(p =>
+                        p.IdPropietario == restauranteId &&
+                        p.FechaCreacion >= fechaDesde)
+                })
+                .OrderByDescending(m => m.Cantidad)
+                .ToListAsync();
+        }
 
 
     }

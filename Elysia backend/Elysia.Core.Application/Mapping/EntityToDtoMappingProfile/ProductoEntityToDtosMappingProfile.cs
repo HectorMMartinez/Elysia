@@ -25,7 +25,7 @@ namespace Elysia.Core.Application.Mapping.EntityToDtoMappingProfile
                 .ForMember(x => x.IdPropietario, opt => opt.Ignore())
                  .ForMember(x => x.Imagen, opt => opt.Ignore());
 
-
+            CreateMap<EditarProductoDto,ProductoResponseDto>().ReverseMap();
 
             CreateMap<EditarProductoDto, EditarProductoRequestDto>()
                 .ReverseMap()

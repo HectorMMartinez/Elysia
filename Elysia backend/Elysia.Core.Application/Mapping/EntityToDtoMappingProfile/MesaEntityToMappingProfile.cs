@@ -34,6 +34,7 @@ namespace Elysia.Core.Application.Mapping.EntityToDtoMappingProfile
 
             CreateMap<Mesa, CreateMesaDto>().ReverseMap();
             CreateMap<Mesa, EditarMesaDto>().ReverseMap();
+            CreateMap<MesaResponseDto, EditarMesaDto>().ReverseMap();
             CreateMap<Mesa,MesaResponseDto>().ReverseMap();
 
         } 
