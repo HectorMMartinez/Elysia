@@ -27,6 +27,10 @@ namespace Elysia.Core.Application.Mapping.EntityToDtoMappingProfile
 
             CreateMap<Plato, PlatoResponseDto>()
                 .ReverseMap();
+
+            CreateMap<PlatoResponseDto, PlatoResponseDto>()
+              .ReverseMap();
+
             CreateMap<CreatePlatoDto,Plato>().ReverseMap();
             CreateMap<EditarPlatoDto,EditarPlatoRequestDto>().ReverseMap(); 
             CreateMap<EditarPlatoDto,PlatoResponseDto>().ReverseMap();

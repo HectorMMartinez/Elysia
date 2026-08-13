@@ -21,11 +21,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\" />
+    <ProjectReference Include="..\Elysia.Core.Application\Elysia.Core.Application.csproj" />
+    <ProjectReference Include="..\Elysia.Core.Domain\Elysia.Core.Domain.csproj" />
+    <ProjectReference Include="..\Elysia.Infraestructure.CenterIA\Elysia.Infraestructure.CenterIA.csproj" />
+    <ProjectReference Include="..\Elysia.Infraestructure.Identity\Elysia.Infraestructure.Identity.csproj" />
+    <ProjectReference Include="..\Elysia.Infraestructure.persistences\Elysia.Infraestructure.persistences.csproj" />
+    <ProjectReference Include="..\Elysia.Infraestructure.Shared\Elysia.Infraestructure.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Elysia.Core.Application\Elysia.Core.Application.csproj" />
+    <Folder Include="Services\bli\" />
   </ItemGroup>
 
 </Project>
