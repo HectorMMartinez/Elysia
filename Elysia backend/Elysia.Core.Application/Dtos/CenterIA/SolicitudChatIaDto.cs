@@ -14,6 +14,6 @@ namespace Elysia.Core.Application.Dtos.CenterIA
         /// Historial de la conversación (opcional).
         /// El frontend envía los mensajes anteriores.
         /// </summary>
-        public List<MensajeChatDto> Historial { get; set; } = new();
+        public List<MensajeChatDto>? Historial { get; set; } = new();
     }
 }

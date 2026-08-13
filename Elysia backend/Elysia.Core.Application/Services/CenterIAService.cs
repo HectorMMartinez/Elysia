@@ -202,49 +202,60 @@ namespace Elysia.Core.Application.Services
             var contexto = await ConstruirContextoMenuAsync(restauranteId);
 
             // 2. Instructions
-            var instructions = """
-                   Eres un consultor gastronómico y de rentabilidad especializado en restaurantes, con amplia experiencia optimizando menús para aumentar ventas y márgenes.
+                var instructions = """
+                 Eres un consultor gastronómico y de rentabilidad especializado en restaurantes, con amplia experiencia optimizando menús para aumentar ventas y márgenes.
 
-                  Tu estilo es:
-                  - Directo, profesional y orientado a resultados
-                  - Basado en datos reales de ventas y precios
-                  - Honesto y constructivo
-                  - Enfocado en rentabilidad, rotación de platos y experiencia del cliente
+                 Tu estilo es:
+                 - Directo, profesional y orientado a resultados
+                 - Basado en datos reales de ventas, precios y estructura de menús
+                 - Honesto y constructivo
+                 - Enfocado en rentabilidad, rotación de platos y experiencia del cliente
 
-                   Tu tarea es analizar el desempeño del menú de un restaurante y generar recomendaciones concretas.
+                 Tu tarea es analizar el desempeño del menú (o menús) de un restaurante y generar recomendaciones concretas.
 
-                 REGLAS IMPORTANTES:
-                 1. Responde ÚNICAMENTE con un JSON válido, sin texto adicional antes o después.
-                 2. No inventes datos que no estén en el contexto.
-                 3. Cada recomendación debe incluir una justificación clara de al menos 2-3 oraciones.
-                 4. Todo el contenido debe estar en español.
-                 5. Si un plato no tiene ventas, menciónalo como candidato a revisar o retirar.
+                 CONTEXTO MULTI-MENÚ (importante):
+                 - Un restaurante puede tener UNO o VARIOS menús (principal, del día, infantil, etc.).
+                 - Debes tener en cuenta esa estructura al analizar.
+                 - No trates todos los platos como si pertenecieran a una sola carta indistinta.
+                 - Cuando generes una recomendación sobre un plato, indica el menú al que pertenece si esa información está en el contexto (ejemplo: "Hamburguesa Clásica (Menú principal): ...").
+                 - Si un plato está en más de un menú, indícalo.
+                 - Los platos huérfanos (sin menú asignado) deben mencionarse de forma explícita, sobre todo en retirar o en sugerencias de asignación.
+                 - Si solo hay un menú, analiza con normalidad sin forzar referencias innecesarias.
 
-                Estructura exacta del JSON que debes devolver:
-              {
-               "Resumen": "Resumen ejecutivo del estado del menú (3-5 oraciones)",
-               "PlatosPromocionar": [
-               "Nombre del plato: justificación completa de por qué promocionarlo (mínimo 2-3 oraciones)"
-              ],
-              "PlatosRevisarPrecio": [
-              "Nombre del plato: justificación completa de por qué revisar su precio (mínimo 2-3 oraciones)"
-              ],
-               "PlatosRetirar": [
-               "Nombre del plato: justificación completa de por qué considerarlo para retirar (mínimo 2-3 oraciones)"
-               ],
-              "NuevasSugerencias": [
-                  "Sugerencia concreta: justificación completa (mínimo 2-3 oraciones)"
-               ]
-            }
-        """;
+                  REGLAS IMPORTANTES:
+                   1. Responde ÚNICAMENTE con un JSON válido, sin texto adicional antes o después.
+                   2. No inventes datos que no estén en el contexto.
+                   3. Cada recomendación debe incluir una justificación clara de al menos 2-3 oraciones.
+                   4. Todo el contenido debe estar en español.
+                   5. Si un plato no tiene ventas, menciónalo como candidato a revisar o retirar.
+                   6. Prioriza acciones de alto impacto: platos top, platos sin ventas, platos huérfanos y riesgos de stock si aparecen en el contexto.
+                   7. Diferencia, cuando aplique, entre menú principal y menús secundarios o temporales.
+
+                 Estructura exacta del JSON que debes devolver:
+                 {
+                   "Resumen": "Resumen ejecutivo del estado del menú o menús (3-5 oraciones). Si hay varios menús, menciónalo.",
+                   "PlatosPromocionar": [
+                      "Nombre del plato (Menú X): justificación completa de por qué promocionarlo (mínimo 2-3 oraciones)"
+                     ],
+                   "PlatosRevisarPrecio": [
+                      "Nombre del plato (Menú X): justificación completa de por qué revisar su precio (mínimo 2-3 oraciones)"
+                    ],
+                   "PlatosRetirar": [
+                        "Nombre del plato (Menú X): justificación completa de por qué considerarlo para retirar (mínimo 2-3 oraciones)"
+                     ],
+                   "NuevasSugerencias": [
+                      "Sugerencia concreta (puede ser por menú o transversal): justificación completa (mínimo 2-3 oraciones)"
+                    ] 
+                    }
+                 """;
 
             // 3. Prompt
             var prompt = $"""
-              A continuación tienes los datos reales del menú y su desempeño en los últimos 30 días.
-              Analízalos y genera las recomendaciones solicitadas.
-
-        {contexto}
-        """;
+                 A continuación tienes los datos reales del menú (o menús) y su desempeño en los últimos 30 días.
+                 El restaurante puede tener varios menús: analízalos con esa estructura y no los mezcles como una sola carta.
+                 Genera las recomendaciones solicitadas.
+                {contexto}
+                """;
 
             // 4. Llamar a OpenAI
             var respuestaTexto = await openAIProvider.GenerarRespuestaAsync(prompt, instructions);
@@ -369,6 +380,78 @@ namespace Elysia.Core.Application.Services
             }
             sb.AppendLine();
 
+
+            // ========== MOVIMIENTOS DE INVENTARIO (últimos 30 días) ==========
+            var productosIds = productosActivos.Select(p => p.Id).ToList();
+
+            sb.AppendLine("=== MOVIMIENTOS DE INVENTARIO (últimos 30 días) ===");
+
+            if (productosIds.Count == 0)
+            {
+                sb.AppendLine("No hay productos activos para analizar movimientos.");
+            }
+            else
+            {
+                // IQueryable: filtra en BD si el provider es EF
+                var movimientos = movimientoRepository.GetAllQuariableAsync()
+                    .Where(m => productosIds.Contains(m.ProductoId) && m.FechaMovimiento >= fechaDesde)
+                    .ToList(); // si es async real: usa ToListAsync() con using Microsoft.EntityFrameworkCore
+
+                if (movimientos.Count == 0)
+                {
+                    sb.AppendLine("No hay movimientos registrados en los últimos 30 días.");
+                }
+                else
+                {
+                    var entradas = movimientos.Where(m => m.TipoMovimiento == TipoMovimientoInventario.Entrada).ToList();
+                    var salidas = movimientos.Where(m => m.TipoMovimiento == TipoMovimientoInventario.Salida).ToList();
+                    var ajustes = movimientos.Where(m => m.TipoMovimiento == TipoMovimientoInventario.Ajuste).ToList();
+
+                    sb.AppendLine($"Total movimientos: {movimientos.Count}");
+                    sb.AppendLine($"- Entradas: {entradas.Count} (cantidad: {entradas.Sum(x => x.Cantidad):N2})");
+                    sb.AppendLine($"- Salidas: {salidas.Count} (cantidad: {salidas.Sum(x => x.Cantidad):N2})");
+                    sb.AppendLine($"- Ajustes: {ajustes.Count} (cantidad: {ajustes.Sum(x => x.Cantidad):N2})");
+
+                    // Nombre desde productos ya cargados (no dependemos de m.Producto)
+                    var productosPorId = productosActivos.ToDictionary(p => p.Id, p => p.Nombre);
+
+                    var topSalidas = salidas
+                        .GroupBy(m => m.ProductoId)
+                        .Select(g => new
+                        {
+                            Nombre = productosPorId.TryGetValue(g.Key, out var n) ? n : $"Producto {g.Key}",
+                            Cantidad = g.Sum(x => x.Cantidad)
+                        })
+                        .OrderByDescending(x => x.Cantidad)
+                        .Take(8)
+                        .ToList();
+
+                    sb.AppendLine("Productos con mayor salida (consumo/rotación):");
+                    foreach (var item in topSalidas)
+                        sb.AppendLine($"- {item.Nombre}: {item.Cantidad:N2}");
+
+                    // Señal simple de posible sobre-stock: entradas sin salidas
+                    var idsConSalida = salidas.Select(s => s.ProductoId).ToHashSet();
+                    var soloEntradas = entradas
+                        .Select(e => e.ProductoId)
+                        .Distinct()
+                        .Where(id => !idsConSalida.Contains(id))
+                        .Take(5)
+                        .ToList();
+
+                    if (soloEntradas.Count > 0)
+                    {
+                        sb.AppendLine("Productos con entradas pero sin salidas en el período:");
+                        foreach (var id in soloEntradas)
+                        {
+                            var nombre = productosPorId.TryGetValue(id, out var n) ? n : $"Producto {id}";
+                            sb.AppendLine($"- {nombre}");
+                        }
+                    }
+                }
+            }
+            sb.AppendLine();
+
             // ========== RESERVAS ==========
             var reservas = await reservasRepository.GetReservasByPropietarioAndFecha(restauranteId, fechaDesde);
 
@@ -421,22 +504,47 @@ namespace Elysia.Core.Application.Services
 
 
 
-
         private async Task<string> ConstruirContextoMenuAsync(string restauranteId)
         {
             var sb = new StringBuilder();
             var fechaDesde = DateTime.UtcNow.Date.AddDays(-30);
 
-            // Platos del restaurante
-            var platos = await platoRepository.GetAllByPropietarioId(restauranteId);
-            var platosList = platos?.ToList() ?? new List<Plato>();
-
-            // Pedidos de los últimos 30 días (para calcular ventas)
+            // --- Base ---
+            var platos = (await platoRepository.GetAllByPropietarioId(restauranteId))?.ToList()
+                         ?? new List<Plato>();
             var pedidos = await pedidoRepository.GetPedidosByPropietarioAndFecha(restauranteId, fechaDesde);
+            var productos = await productoRepository.GetListProductosByPropietarioid(restauranteId);
+            var productosDict = (productos ?? new List<Producto>()).ToDictionary(p => p.Id);
 
-            // Calcular ventas por plato
+            // --- Menús ---
+            var menus = (await menuRepository.GetListMenuByPropietarioId(restauranteId))
+                ?.Where(m => m != null)
+                .Cast<Menu>()
+                .ToList() ?? new List<Menu>();
+
+            // PlatoMenus de todos los menús del propietario
+            var platoMenus = new List<PlatoMenu>();
+            foreach (var menu in menus)
+            {
+                var lista = await platoMenuRepository.GetListByMenuId(menu.Id);
+                if (lista != null)
+                    platoMenus.AddRange(lista.Where(x => x != null)!);
+            }
+
+            var platosEnMenu = platoMenus.Select(pm => pm.IdPlato).ToHashSet();
+            var platosHuerfanos = platos.Where(p => !platosEnMenu.Contains(p.Id)).ToList();
+
+            // --- Recetas (PlatoProducto) en una sola query ---
+            var platoIds = platos.Select(p => p.Id).ToList();
+            var platoProductos = platoIds.Count == 0
+                ? new List<PlatoProducto>()
+                : platoProductoRepository.GetAllQuariableAsync()
+                    .Where(pp => platoIds.Contains(pp.PlatoId))
+                    .ToList();
+
+            // --- Ventas ---
             var ventasPorPlato = pedidos
-                .SelectMany(p => p.DetallesPedidos)
+                .SelectMany(p => p.DetallesPedidos ?? Enumerable.Empty<DetallesPedido>())
                 .GroupBy(d => d.PlatoId)
                 .Select(g => new
                 {
@@ -446,24 +554,66 @@ namespace Elysia.Core.Application.Services
                 })
                 .ToDictionary(x => x.PlatoId, x => x);
 
-            sb.AppendLine("=== DESEMPEÑO DEL MENÚ (últimos 30 días) ===");
-            sb.AppendLine($"Total de platos registrados: {platosList.Count}");
+            // ========== ESTRUCTURA ==========
+            sb.AppendLine("=== ESTRUCTURA DE MENÚS ===");
+            sb.AppendLine($"Total menús: {menus.Count}");
+            sb.AppendLine($"Total platos registrados: {platos.Count}");
+            sb.AppendLine($"Platos en al menos un menú: {platosEnMenu.Count}");
+            sb.AppendLine($"Platos huérfanos (sin menú): {platosHuerfanos.Count}");
+
+            if (platosHuerfanos.Count > 0)
+            {
+                sb.AppendLine("Platos sin menú asignado:");
+                foreach (var p in platosHuerfanos.Take(10))
+                    sb.AppendLine($"- {p.Nombre} | Precio: ${p.Precio:N2}");
+            }
             sb.AppendLine();
 
-            // Top más vendidos
+            if (menus.Count > 0)
+            {
+                sb.AppendLine("Resumen por menú:");
+                foreach (var menu in menus.Take(10))
+                {
+                    var cant = platoMenus.Count(pm => pm.IdMenu == menu.Id);
+                    var etiqueta = menu.IsPrincipal ? " (principal)" : string.Empty;
+                    sb.AppendLine($"- {menu.Nombre}{etiqueta}: {cant} platos");
+                }
+                sb.AppendLine();
+            }
+
+            // ========== DESEMPEÑO + RIESGO STOCK ==========
+            sb.AppendLine("=== DESEMPEÑO DEL MENÚ (últimos 30 días) ===");
+
+            string InfoRiesgo(int platoId)
+            {
+                var ings = platoProductos.Where(pp => pp.PlatoId == platoId).ToList();
+                if (ings.Count == 0) return " | Sin receta cargada";
+
+                var enRiesgo = new List<string>();
+                foreach (var ing in ings)
+                {
+                    if (!productosDict.TryGetValue(ing.ProductoId, out var prod)) continue;
+                    if (prod.Activo && prod.StockActual <= prod.StockMinimo)
+                        enRiesgo.Add(prod.Nombre);
+                }
+                return enRiesgo.Count > 0
+                    ? $" | Riesgo stock: {string.Join(", ", enRiesgo.Take(3))}"
+                    : string.Empty;
+            }
+
             var masVendidos = ventasPorPlato.Values
                 .OrderByDescending(x => x.CantidadVendida)
                 .Take(8)
                 .ToList();
 
             sb.AppendLine("Top platos más vendidos:");
-            if (masVendidos.Any())
+            if (masVendidos.Count > 0)
             {
                 foreach (var item in masVendidos)
                 {
-                    var plato = platosList.FirstOrDefault(p => p.Id == item.PlatoId);
+                    var plato = platos.FirstOrDefault(p => p.Id == item.PlatoId);
                     var precio = plato?.Precio ?? 0;
-                    sb.AppendLine($"- {item.Nombre} | Vendidos: {item.CantidadVendida} | Precio: ${precio:N2}");
+                    sb.AppendLine($"- {item.Nombre} | Vendidos: {item.CantidadVendida} | Precio: ${precio:N2}{InfoRiesgo(item.PlatoId)}");
                 }
             }
             else
@@ -472,46 +622,37 @@ namespace Elysia.Core.Application.Services
             }
             sb.AppendLine();
 
-            // Platos con baja o nula rotación
             sb.AppendLine("Platos con baja o nula rotación:");
-            var platosConPocasVentas = platosList
+            var bajaRotacion = platos
                 .Select(p =>
                 {
-                    ventasPorPlato.TryGetValue(p.Id, out var venta);
-                    return new
-                    {
-                        Plato = p,
-                        Cantidad = venta?.CantidadVendida ?? 0
-                    };
+                    ventasPorPlato.TryGetValue(p.Id, out var v);
+                    return new { Plato = p, Cantidad = v?.CantidadVendida ?? 0 };
                 })
                 .OrderBy(x => x.Cantidad)
-                .Take(8)
-                .ToList();
+                .Take(8);
 
-            foreach (var item in platosConPocasVentas)
+            foreach (var item in bajaRotacion)
             {
-                sb.AppendLine($"- {item.Plato.Nombre} | Vendidos: {item.Cantidad} | Precio: ${item.Plato.Precio:N2}");
+                sb.AppendLine(
+                    $"- {item.Plato.Nombre} | Vendidos: {item.Cantidad} | Precio: ${item.Plato.Precio:N2}{InfoRiesgo(item.Plato.Id)}");
             }
             sb.AppendLine();
 
-            // Lista completa resumida (útil para la IA)
-            sb.AppendLine("Lista completa de platos (Nombre | Precio | Unidades vendidas):");
-            foreach (var p in platosList.OrderByDescending(x =>
+            sb.AppendLine("Lista completa (Nombre | Precio | Unidades | Riesgo):");
+            foreach (var p in platos.OrderByDescending(x =>
             {
                 ventasPorPlato.TryGetValue(x.Id, out var v);
                 return v?.CantidadVendida ?? 0;
             }))
             {
                 ventasPorPlato.TryGetValue(p.Id, out var venta);
-                var cantidad = venta?.CantidadVendida ?? 0;
-                sb.AppendLine($"- {p.Nombre} | ${p.Precio:N2} | {cantidad} unidades");
+                var cant = venta?.CantidadVendida ?? 0;
+                sb.AppendLine($"- {p.Nombre} | ${p.Precio:N2} | {cant} uds{InfoRiesgo(p.Id)}");
             }
 
             return sb.ToString();
         }
-
-
-
 
 
 
