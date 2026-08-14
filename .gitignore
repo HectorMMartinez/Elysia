@@ -1,0 +1,50 @@
+# Node
+node_modules/
+dist/
+.vite/
+
+# React env
+.env
+.env.*
+
+# .NET
+**/bin/
+**/obj/
+**/publish/
+
+# Visual Studio
+.vs/
+*.user
+*.rsuser
+*.suo
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Databases
+*.mdf
+*.ldf
+*.db
+*.sqlite
+*.sqlite3
+
+# Certificates
+*.pfx
+*.key
+*.pem
+
+# JetBrains
+.idea/
+
+# Coverage
+coverage/
+TestResults/
+
+# Cache
+*.cache
+
+# User uploaded images
+**/wwwroot/images/

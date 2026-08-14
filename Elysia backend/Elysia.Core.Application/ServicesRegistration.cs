@@ -1,0 +1,55 @@
+﻿using Elysia.Core.Application.Interfaces;
+using Elysia.Core.Application.Services;
+using Elysia.Core.Domain.Entities;
+using Elysia.Core.Domain.Settings;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Elysia.Core.Application
+{
+    public static class ServicesRegistration
+    {
+        public static void AddServicesLayerIOC(this IServiceCollection services)
+        {
+
+            #region generalConfiguration
+            services.AddAutoMapper(opt => { }, Assembly.GetExecutingAssembly());
+            #endregion
+
+
+
+            #region services Registration IOC
+            services.AddScoped(typeof(IGenericService<,,,>), typeof(GenericService<,,,>));
+            services.AddScoped<IMembresiaService, MembresiaService>();
+            services.AddScoped<ITarjetaService, TarjetaService>();
+            services.AddScoped<IPlanService, PlanService>();
+            services.AddScoped<IProductoService, productoService>();
+            services.AddScoped<ICategoriaPlatoService, CategoriaPlatoService>();
+            services.AddScoped<IMovimientoInventarioService, MovimientoInventarioService>();
+            services.AddScoped<IPlatoService, PlatoService>();
+            services.AddScoped<IMesaService, MesaService>();
+            services.AddScoped<IMenuService, MenuServices>();
+            services.AddScoped<IPlatoMenuService, PlatoMenuService>();
+            services.AddScoped<IReservaServices, ReservaServices>();
+            services.AddScoped<IPedidoService, PedidoService>();
+            services.AddScoped<IPuestoService,PuestoService>();
+            services.AddScoped<IEmpleadoService, EmpleadoService>();
+            services.AddScoped<IShiftService,ShiftService>();
+            services.AddScoped<IShiftEmpleadoService, ShiftEmpleadoService>();
+            services.AddScoped<ICenterIAService, CenterIAService>();
+            services.AddScoped<IDashboardPropietarioServices, DashboardPropietarioServices>();
+            services.AddScoped<IDashboardAdminService, DashboardAdminService>();
+
+            #endregion
+
+
+        }
+
+    }
+}
