@@ -17,7 +17,7 @@ import ReservasPage from "../pages/reservas/ReservasPage";
 import PedidosPage from "../pages/pedido/PedidosPage";
 import TurnosPage from "../pages/shifts/TurnosPage";
 import EmpleadosPage from "../pages/empleado/EmpleadosPage";
-// import CentralInteligenciaPage from "../pages/central/CentralInteligenciaPage";
+import CenterIAPage from "../pages/centerIA/CenterIAPage";
 import OwnerProfilePage from "../pages/owner/OwnerProfilePage";
 
 
@@ -140,6 +140,18 @@ export default function AppRoutes() {
             </PrivateRoute>
           }
         />
+
+
+         <Route
+          path="/centerIA"
+          element={
+            <PrivateRoute>
+              <CenterIAPage/>
+            </PrivateRoute>
+          }
+        />
+
+
 
         {/* ========== RUTAS ADMIN ========== */}
         <Route

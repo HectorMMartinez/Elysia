@@ -67,6 +67,7 @@ public class OpenAIProvider : IOpenAIProvider
         if (openAiResponse is null || string.IsNullOrWhiteSpace(openAiResponse.OutputText))
             throw new InvalidOperationException("La respuesta de OpenAI no contiene texto válido.");
 
+
         return openAiResponse.OutputText;
     }
 }

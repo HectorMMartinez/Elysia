@@ -56,8 +56,11 @@ namespace Elysia.unit.Tests.Services
             var mesaRepository = new MesaRepository(_context);
             var platoRepository = new PlatoRepository(_context);
             var detallesPedidoRepository = new DetallesPedidoRepository(_context);
+            var movimientoRepo = new MovimientoInventarioRepository(_context);
+            var movimientoInventarioService = new MovimientoInventarioService(movimientoRepo,productoRepository,mapper);
 
             return new PedidoService(
+                movimientoInventarioService,
                 pedidoRepository,
                 productoRepository,
                 platoProductoRepository,

@@ -28,9 +28,9 @@ namespace Elysia.Core.Application.Services
         private readonly IDashboardPropietarioServices dashboardPropietarioServices; //contiene un metodo que devuelve los indicadores con otros ids
         private readonly IOpenAIProvider openAIProvider;
         private readonly IPlatoRepository platoRepository;
+        private readonly IMesaRepository mesaRepository;
 
-
-        public CenterIAService(IOpenAIProvider openAIProvider, IReservasRepository reservasRepository, IPlatoRepository platoRepository, IPedidoRepository pedidoRepository, IProductoRepository productoRepository, IPlatoProductoRepository platoProductoRepository, IShiftRepository shiftRepository, IShiftEmpleadoRepository shiftEmpleadoRepository, IEmpleadoRepository empleadoRepository, IMenuRepository menuRepository, IPlatoMenuRepository platoMenuRepository, IDetallesPedidoRepository detallesPedidoRepository, IMovimientoRepository movimientoRepository, IDashboardPropietarioServices dashboardPropietarioServices)
+        public CenterIAService(IMesaRepository mesaRepository,IOpenAIProvider openAIProvider, IReservasRepository reservasRepository, IPlatoRepository platoRepository, IPedidoRepository pedidoRepository, IProductoRepository productoRepository, IPlatoProductoRepository platoProductoRepository, IShiftRepository shiftRepository, IShiftEmpleadoRepository shiftEmpleadoRepository, IEmpleadoRepository empleadoRepository, IMenuRepository menuRepository, IPlatoMenuRepository platoMenuRepository, IDetallesPedidoRepository detallesPedidoRepository, IMovimientoRepository movimientoRepository, IDashboardPropietarioServices dashboardPropietarioServices)
         {
             this.reservasRepository = reservasRepository;
             this.pedidoRepository = pedidoRepository;
@@ -46,6 +46,7 @@ namespace Elysia.Core.Application.Services
             this.dashboardPropietarioServices = dashboardPropietarioServices;
             this.openAIProvider = openAIProvider;
             this.platoRepository = platoRepository;
+            this.mesaRepository = mesaRepository;
 
 
 
@@ -363,6 +364,75 @@ namespace Elysia.Core.Application.Services
                 sb.AppendLine("No hay pedidos registrados en los últimos 30 días.");
             }
             sb.AppendLine();
+
+            // ========== MESAS ==========
+            var mesasReservas = await mesaRepository
+                .GetMesasConMasReservasAsync(restauranteId, fechaDesde);
+
+            var mesasPedidos = await mesaRepository
+                .GetMesasConMasPedidosAsync(restauranteId, fechaDesde);
+
+            sb.AppendLine("=== MESAS (últimos 30 días) ===");
+
+            if (!mesasReservas.Any() && !mesasPedidos.Any())
+            {
+                sb.AppendLine("No hay mesas registradas para analizar.");
+            }
+            else
+            {
+                sb.AppendLine($"Total de mesas: {mesasReservas.Count}");
+
+                // ----- RESERVAS -----
+
+                sb.AppendLine();
+                sb.AppendLine("Mesas con más reservas:");
+
+                foreach (var mesa in mesasReservas.Take(5))
+                {
+                    sb.AppendLine(
+                        $"- {mesa.Codigo}: {mesa.Cantidad} reservas | " +
+                        $"Capacidad: {mesa.Capacidad} | Estado: {mesa.Estado}");
+                }
+
+                sb.AppendLine();
+                sb.AppendLine("Mesas con menos reservas:");
+
+                foreach (var mesa in mesasReservas
+                    .OrderBy(m => m.Cantidad)
+                    .Take(5))
+                {
+                    sb.AppendLine(
+                        $"- {mesa.Codigo}: {mesa.Cantidad} reservas | " +
+                        $"Capacidad: {mesa.Capacidad} | Estado: {mesa.Estado}");
+                }
+
+                // ----- PEDIDOS -----
+
+                sb.AppendLine();
+                sb.AppendLine("Mesas con más pedidos:");
+
+                foreach (var mesa in mesasPedidos.Take(5))
+                {
+                    sb.AppendLine(
+                        $"- {mesa.Codigo}: {mesa.Cantidad} pedidos | " +
+                        $"Capacidad: {mesa.Capacidad} | Estado: {mesa.Estado}");
+                }
+
+                sb.AppendLine();
+                sb.AppendLine("Mesas con menos pedidos:");
+
+                foreach (var mesa in mesasPedidos
+                    .OrderBy(m => m.Cantidad)
+                    .Take(5))
+                {
+                    sb.AppendLine(
+                        $"- {mesa.Codigo}: {mesa.Cantidad} pedidos | " +
+                        $"Capacidad: {mesa.Capacidad} | Estado: {mesa.Estado}");
+                }
+            }
+
+            sb.AppendLine();
+
 
             // ========== INVENTARIO ==========
             var productos = await productoRepository.GetListProductosByPropietarioid(restauranteId);

@@ -112,7 +112,7 @@ namespace Elysia.Core.Application.Services
                 foreach (var plato in data)
                 {
                    var is_asociado_menu = await platoMenuRepository.GetListByPlatoId(plato.Id);
-                    if (is_asociado_menu != null)
+                    if (is_asociado_menu != null && plato.Estado == PlatoEstado.Disponible)
                     {
                         var asociado = _mapper.Map<PlatoResponseDto>(plato);
                         listAsociados.Add(asociado);

@@ -1,4 +1,5 @@
-﻿using Elysia.Core.Domain.Entities;
+﻿using Elysia.Core.Domain.Common;
+using Elysia.Core.Domain.Entities;
 using ReservaBook.Core.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,8 @@ namespace Elysia.Core.Domain.interfaces
         Task<List<Mesa>> GetAllDisponibleXByPropietarioId(string propietarioId);
         Task<List<Mesa>> GetAllOcupadasXByPropietarioId(string propietarioId);
         Task<List<Mesa>> GetAllReservadasXByPropietarioId(string propietarioId);
-
+        Task<List<MesaEstadisticaDto>> GetMesasConMasReservasAsync(string restauranteId, DateTime fechaDesde);
+        Task<List<MesaEstadisticaDto>> GetMesasConMasPedidosAsync(string restauranteId, DateTime fechaDesde);
 
 
     }
