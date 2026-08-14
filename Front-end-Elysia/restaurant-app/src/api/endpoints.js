@@ -142,6 +142,11 @@ SHIFT: {
   DESASOCIAR_EMPLEADO: (id) => `/Shift/delete-turno-empleado/${id}`,
 },
 
+CENTER_IA: {
+  GET_ANALISIS_RESTAURANTE: "/CenterIA/get-analisis-restaurante",
+  GET_OPTIMIZACION_MENU: "/CenterIA/get-optimizacion-menu",
+  CONSULTAR_ASISTENTE: "/CenterIA/consultar-asistente",
+},
 
 };
 

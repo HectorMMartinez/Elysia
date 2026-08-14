@@ -111,7 +111,7 @@ export default function OwnerSidebar({ children }) {
     },
     {
       label: "Central de Inteligencia",
-      path: "/central-inteligencia",
+      path: "/centerIA",
       icon: FaChartBar,
       premiumOnly: true,
     },
