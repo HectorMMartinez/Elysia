@@ -567,11 +567,10 @@ Proyecto desarrollado como parte del proceso de formación académica en el **In
 
 ### Equipo de Desarrollo
 
-* Angel Grullon Vicente
-* Cristian Emmanuel Pacheco Cruz
-* Joel Guerra Escoboza
+
+* Hector Martinez
 * Kelvin Jose Diaz Ramirez
-* Roberto Antonio Lopez Garcia
+* Andris Peguero
 
 ---
 
